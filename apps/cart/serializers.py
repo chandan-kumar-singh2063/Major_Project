@@ -17,7 +17,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             return self.context['request'].build_absolute_uri(obj.product.image.url)
         # Try to get the first product image if main image is not available
         first_image = obj.product.images.filter(is_primary=True).first()
-        if first_image:
+        if first_image: 
             return self.context['request'].build_absolute_uri(first_image.image.url)
         # Return the first available image
         first_image = obj.product.images.first()

@@ -177,20 +177,25 @@ class ProductFilterView(generics.ListAPIView):
     """Advanced product filtering with server-side pagination"""
     serializer_class = ProductSerializer
     pagination_class = ProductPagination
-    
+
     def get_queryset(self):
         queryset = Product.objects.filter(is_active=True)
-        
-        # Category filter
-        category_id = self.request.query_params.get('category')
-        if category_id:
-            queryset = queryset.filter(category_id=category_id)
-        
+
+        # Category filter (safe for IDs and names)
+        category = self.request.query_params.get('category')
+        if category:
+            if category.isdigit():
+                # Old behavior: category ID
+                queryset = queryset.filter(category_id=int(category))
+            else:
+                # New behavior: category name (case-insensitive)
+                queryset = queryset.filter(category__name__iexact=category)
+
         # Brand filter
         brand_id = self.request.query_params.get('brand')
         if brand_id:
             queryset = queryset.filter(brand_id=brand_id)
-        
+
         # Price range filter
         min_price = self.request.query_params.get('min_price')
         max_price = self.request.query_params.get('max_price')
@@ -198,17 +203,17 @@ class ProductFilterView(generics.ListAPIView):
             queryset = queryset.filter(price__gte=min_price)
         if max_price:
             queryset = queryset.filter(price__lte=max_price)
-        
+
         # Stock status filter
         stock_status = self.request.query_params.get('stock_status')
         if stock_status:
             queryset = queryset.filter(stock_status=stock_status)
-        
+
         # Rating filter
         min_rating = self.request.query_params.get('min_rating')
         if min_rating:
             queryset = queryset.filter(rating_average__gte=min_rating)
-        
+
         # Search filter
         search = self.request.query_params.get('search')
         if search:
@@ -218,12 +223,12 @@ class ProductFilterView(generics.ListAPIView):
                 Q(category__name__icontains=search) |
                 Q(brand__name__icontains=search)
             )
-        
+
         # Sorting
         sort_by = self.request.query_params.get('sort_by', '-created_at')
         if sort_by in ['price', '-price', 'name', '-name', 'created_at', '-created_at', 'rating_average', '-rating_average']:
             queryset = queryset.order_by(sort_by)
-        
+
         return queryset.select_related('category', 'brand').prefetch_related('images')
 
 class FeaturedProductsView(generics.ListAPIView):

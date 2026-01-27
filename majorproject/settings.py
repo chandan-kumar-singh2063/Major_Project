@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-$)#&%ak4lf8-w&u96t=66j)v-4u83lafj71=9+bmi7*@(fhd8k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'apps.authentication',
     'apps.orders',
     'apps.categories',
+    'apps.payment',
     'import_export',
     'django.contrib.sites',
     'allauth',
@@ -65,6 +66,7 @@ SITE_ID = 2
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -90,7 +92,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
 

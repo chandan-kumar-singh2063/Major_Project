@@ -6,6 +6,7 @@ import Footer from './Footer';
 import { productsAPI } from '@/api/services';
 import { useCart } from '@/contexts/CartContext';
 
+
 interface Product {
   id: number;
   name: string;
@@ -99,41 +100,77 @@ const ProductDetailPage = () => {
     }
   };
 
-  const buyNow = async () => {
-    if (!product) return;
+  // const buyNow = async () => {
+  //   if (!product) return;
     
-    try {
-      setCartLoading(true);
-      setErrorMsg(null);
-      setSuccessMsg(null);
+  //   try {
+  //     setCartLoading(true);
+  //     setErrorMsg(null);
+  //     setSuccessMsg(null);
       
-      console.log('Buy now - adding product to cart:', { 
-        productId: product.id, 
-        quantity,
-        size: shouldShowSizeOptions ? selectedSize : undefined,
-        color: selectedColor
-      });
-      await addToCartContext(product.id, quantity);
-      setSuccessMsg('Item added to cart! Redirecting to checkout...');
+  //     console.log('Buy now - adding product to cart:', { 
+  //       productId: product.id, 
+  //       quantity,
+  //       size: shouldShowSizeOptions ? selectedSize : undefined,
+  //       color: selectedColor
+  //     });
+  //     await addToCartContext(product.id, quantity);
+  //     setSuccessMsg('Item added to cart! Redirecting to checkout...');
       
-      // Navigate to cart after a short delay
-      setTimeout(() => {
-        navigate('/cart');
-      }, 1000);
-    } catch (error: any) {
-      console.error('Error in buy now:', error);
+  //     // Navigate to cart after a short delay
+  //     setTimeout(() => {
+  //       navigate('/cart');
+  //     }, 1000);
+  //   } catch (error: any) {
+  //     console.error('Error in buy now:', error);
       
-      if (error.message === 'Authentication required' || error.response?.status === 401) {
-        setErrorMsg('Please login to purchase items');
-      } else if (error.response?.status === 400) {
-        setErrorMsg(error.response.data?.message || 'Invalid request. Please try again.');
-      } else {
-        setErrorMsg('Failed to process purchase. Please try again.');
-      }
-    } finally {
-      setCartLoading(false);
+  //     if (error.message === 'Authentication required' || error.response?.status === 401) {
+  //       setErrorMsg('Please login to purchase items');
+  //     } else if (error.response?.status === 400) {
+  //       setErrorMsg(error.response.data?.message || 'Invalid request. Please try again.');
+  //     } else {
+  //       setErrorMsg('Failed to process purchase. Please try again.');
+  //     }
+  //   } finally {
+  //     setCartLoading(false);
+  //   }
+  // };
+
+const PaymentInitiation = async () => {
+  if (!product) return;
+  
+  try {
+    setCartLoading(true);
+    setErrorMsg(null);
+    
+    const response = await fetch("http://localhost:8000/api/payment/khalti/initiate/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: Math.round(productPrice * 100), // Khalti expects amount in paisa
+        name: product.name,
+        email: "customer@example.com",
+      }),
+    });
+    
+    const data = await response.json();
+    
+    if (data.pidx && data.payment_url) {
+      window.location.href = data.payment_url;
+    } else {
+      setErrorMsg('Failed to initiate payment. Please try again.');
     }
-  };
+  } catch (error) {
+    console.error('Payment initiation error:', error);
+    setErrorMsg('Failed to initiate payment. Please try again.');
+  } finally {
+    setCartLoading(false);
+  }
+};
+
+
 
   const addToWishlist = () => {
     setSuccessMsg('Added to wishlist!');
@@ -423,10 +460,11 @@ const ProductDetailPage = () => {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <button 
-                      onClick={buyNow}
+                    <button               
+                      onClick={PaymentInitiation}
+
                       disabled={!productStock || productStock <= 0 || cartLoading}
-                      className="flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="cursor-pointer flex-1 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {cartLoading ? 'Adding...' : 'Buy this Item'}
                     </button>

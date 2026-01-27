@@ -5,6 +5,7 @@
     "react-router-dom": "^7.7.1"
   },
   "devDependencies": {
+    "@types/node": "^25.0.10",
     "@types/react-google-recaptcha": "^2.1.9"
   }
 }

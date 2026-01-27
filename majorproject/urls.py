@@ -1,4 +1,5 @@
 # majorproject/urls.py
+from django.http import JsonResponse
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -15,8 +16,13 @@ from apps.authentication.views_social import CustomGoogleLogin
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-
+def home(request):
+    return JsonResponse({
+        "status": "OK",
+        "message": "Major Project API is running"
+    })
 urlpatterns = [
+    path('', home),
     path('admin/', admin.site.urls),
     # API endpoints
     path('api/categories/', include('apps.categories.urls')),
@@ -35,6 +41,7 @@ urlpatterns = [
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('auth/', include('allauth.socialaccount.urls')),
     path('auth/google/', CustomGoogleLogin.as_view(), name='google_login'),
+    path('api/payment', include('apps.payment.urls')),
 
 ]
 
