@@ -3,5 +3,5 @@ from django.urls import path
 from .views import initiate_khalti_payment
 
 urlpatterns = [
-    path('api/khalti/initiate/', initiate_khalti_payment, name='khalti-initiate'),
+    path('khalti/initiate/', initiate_khalti_payment, name='khalti-initiate'),
 ]

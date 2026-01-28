@@ -41,7 +41,7 @@ urlpatterns = [
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('auth/', include('allauth.socialaccount.urls')),
     path('auth/google/', CustomGoogleLogin.as_view(), name='google_login'),
-    path('api/payment', include('apps.payment.urls')),
+    path('api/payment/', include('apps.payment.urls')),
 
 ]
 

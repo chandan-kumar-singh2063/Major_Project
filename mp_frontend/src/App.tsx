@@ -26,6 +26,7 @@ import ResetPasswordRequestPage from './pages/ResetPasswordRequestPage';
 import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import SearchResults from "./components/SearchResults";
 import ProductDetailPage from "./components/ProductDetailPage";
+import PaymentSuccess from "./components/payment-success";
 
 function App() {
   return (
@@ -57,6 +58,9 @@ function App() {
 
             {/* product serach */}
             <Route path="/search-results" element={<SearchResults />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+
+
 
             {/* Optionally: Add a 404 page */}
             <Route path="*" element={<div className="text-center mt-20 text-2xl font-semibold">404 Not Found</div>} />
