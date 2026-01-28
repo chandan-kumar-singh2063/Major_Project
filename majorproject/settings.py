@@ -65,16 +65,20 @@ INSTALLED_APPS = [
     'django_extensions',
     
 ]
-SITE_ID = 2
+SITE_ID = 1
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
     
-]
+# ]
+
+
+
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True 
+
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -88,6 +92,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -95,9 +100,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
+
 
 ROOT_URLCONF = 'majorproject.urls'
 
@@ -207,6 +212,7 @@ REST_USE_JWT = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 }
 
@@ -253,7 +259,8 @@ REST_AUTH_SERIALIZERS = {
 
 RECAPTCHA_SECRET_KEY = '6LfHFYUrAAAAAIpGYjusAkSflMou9S7dmqamtNFT'
 
-# Session configuration - 10 minutes timeout
-SESSION_COOKIE_AGE = 600  # 10 minutes in seconds
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_SAVE_EVERY_REQUEST = True
+# SESSION FIX
+SESSION_COOKIE_AGE = 60 * 60 * 24  # 1 day
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = False
+

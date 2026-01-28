@@ -1,6 +1,4 @@
-// src/App.jsx or src/App.tsx
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "./contexts/CartContext";
 import { ChatBotProvider } from "./contexts/ChatBotContext";
 import ChatBot from "./components/ChatBot";
@@ -27,49 +25,66 @@ import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import SearchResults from "./components/SearchResults";
 import ProductDetailPage from "./components/ProductDetailPage";
 import PaymentSuccess from "./components/payment-success";
+import { useState } from "react";
+import AuthModal from "./components/AuthModal";
+
+// Protected Route wrapper
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const token = localStorage.getItem("access");
+  if (!token) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
 
 function App() {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
   return (
     <CartProvider>
       <ChatBotProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Home/>}/>
-            <Route path="/dashboard" element={<Dashboard/>}/>
-            <Route path="/start-test" element={<StartTest />} />
-            <Route path="/practice-test" element={<PracticeTest />} />
-            <Route path="/tips" element={<TipsPage />} />
-            <Route path="/donate" element={<Donate/>} />
-            <Route path="/contactus" element={<ContactUs/>}/>
-            <Route path="/aboutus" element={<AboutUs/>}/>
-            <Route path="/aboutpage" element={<AboutPage/>}/>
-            <Route path="/helppage" element={<HelpPage/>}/>
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/category/electronics" element={<Electronics/>}/>
-            <Route path="/category/fashion" element={<Fashion/>}/>
-            <Route path="/category/books" element={<Books/>}/>
-            <Route path="/category/gadgets" element={<Gadgets/>}/>
-            <Route path="/category/home_decor" element={<HomeDecor/>}/>
+            <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
+            <Route path="/start-test" element={<ProtectedRoute><StartTest /></ProtectedRoute>} />
+            <Route path="/practice-test" element={<ProtectedRoute><PracticeTest /></ProtectedRoute>} />
+            <Route path="/tips" element={<ProtectedRoute><TipsPage /></ProtectedRoute>} />
+            <Route path="/donate" element={<ProtectedRoute><Donate/></ProtectedRoute>} />
+            <Route path="/contactus" element={<ProtectedRoute><ContactUs/></ProtectedRoute>} />
+            <Route path="/aboutus" element={<ProtectedRoute><AboutUs/></ProtectedRoute>} />
+            <Route path="/aboutpage" element={<ProtectedRoute><AboutPage/></ProtectedRoute>} />
+            <Route path="/helppage" element={<ProtectedRoute><HelpPage/></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/category/electronics" element={<ProtectedRoute><Electronics/></ProtectedRoute>} />
+            <Route path="/category/fashion" element={<ProtectedRoute><Fashion/></ProtectedRoute>} />
+            <Route path="/category/books" element={<ProtectedRoute><Books/></ProtectedRoute>} />
+            <Route path="/category/gadgets" element={<ProtectedRoute><Gadgets/></ProtectedRoute>} />
+            <Route path="/category/home_decor" element={<ProtectedRoute><HomeDecor/></ProtectedRoute>} />
+
+            {/* Auth / Login Pages */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
             <Route path="/reset-password/:uidb64/:token" element={<ResetPasswordConfirmPage />} />
-            <Route path="/product/:id" element={<ProductDetailPage />} />
 
-            {/* product serach */}
-            <Route path="/search-results" element={<SearchResults />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
+            {/* Product & Payment */}
+            <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
+            <Route path="/search-results" element={<ProtectedRoute><SearchResults /></ProtectedRoute>} />
+            <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
 
-
-
-            {/* Optionally: Add a 404 page */}
+            {/* 404 */}
             <Route path="*" element={<div className="text-center mt-20 text-2xl font-semibold">404 Not Found</div>} />
           </Routes>
+
+          <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+          <ChatBot />
         </Router>
-        <ChatBot />
       </ChatBotProvider>
     </CartProvider>
   );
 }
 
 export default App;
+export { ProtectedRoute };

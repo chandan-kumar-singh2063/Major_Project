@@ -22,7 +22,7 @@ const LoginPage = () => {
       const res = await authAPI.login(form);
       localStorage.setItem('access', res.data.access);
       localStorage.setItem('refresh', res.data.refresh);
-      navigate('/');
+      navigate('/', { replace: true }); // redirect to home
     } catch {
       setError('Invalid credentials');
     } finally {
@@ -42,7 +42,7 @@ const LoginPage = () => {
         } else if (res.data.key) {
           localStorage.setItem('access', res.data.key);
         }
-        window.location.href = '/';
+        window.location.href = '/'; // redirect to home
       } catch (err) {
         alert('Google login failed');
       }
@@ -104,4 +104,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage; 
+export default LoginPage;
