@@ -1,4 +1,5 @@
 import api from './config';
+import axios from 'axios';
 
 // Products API
 export const productsAPI = {
@@ -66,6 +67,16 @@ export const authAPI = {
   resetPasswordRequest: (data) => api.post('/auth/password_reset/', data),
   resetPasswordConfirm: ({ uid, token, new_password }) =>
     api.post(`/auth/reset/${uid}/${token}/`, { new_password }),
+  // Google OAuth login (uses different base URL since it's not under /api/)
+  googleLogin: (data) => {
+    const baseURL = import.meta.env.VITE_API_URL 
+      ? import.meta.env.VITE_API_URL.replace('/api', '') 
+      : 'http://localhost:8000';
+    return axios.post(`${baseURL}/auth/google/`, data, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
+  },
 };
 
 // Orders API

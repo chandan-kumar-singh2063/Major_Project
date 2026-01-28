@@ -65,19 +65,19 @@ INSTALLED_APPS = [
     'django_extensions',
     
 ]
-SITE_ID = 1
+SITE_ID = 2
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",
-#     "http://127.0.0.1:5173",
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     
-# ]
+]
 
 
 
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True 
+
 
 CORS_ALLOW_HEADERS = [
     'accept',
@@ -209,11 +209,15 @@ MAX_UPLOAD_SIZE = 5242880  # 5MB
 
 REST_USE_JWT = True
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 }
 
 # Email backend configuration for password reset (production)
@@ -232,6 +236,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
+CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 
 AUTHENTICATION_BACKENDS = (
@@ -240,7 +246,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
-SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = 'apps.authentication.adapters.CustomSocialAccountAdapter'
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # (optional, for dev)
 # Remove deprecated settings
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -251,6 +257,30 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'  # (optional, for dev)
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 SOCIALACCOUNT_AUTO_SIGNUP = True
+
+# Google OAuth Configuration
+# Note: You also need to create a SocialApplication in Django admin with:
+# - Provider: Google
+# - Name: Google
+# - Client id: Your Google OAuth Client ID
+# - Secret key: Your Google OAuth Client Secret
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'OAUTH_PKCE_ENABLED': True,
+        'APP': {
+            'client_id': os.getenv('GOOGLE_OAUTH_CLIENT_ID', '379736466398-bskn351unl206g2fmseqbf3odmnaej68.apps.googleusercontent.com'),
+            'secret': os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', ''),
+            'key': ''
+        }
+    }
+}
 
 REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'dj_rest_auth.serializers.LoginSerializer',
@@ -264,3 +294,26 @@ SESSION_COOKIE_AGE = 60 * 60 * 24  # 1 day
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_SAVE_EVERY_REQUEST = False
 
+
+# Automatically link social accounts to existing users
+SOCIALACCOUNT_AUTO_SIGNUP = True  # create new users if email doesn't exist
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "optional"  # optional verification
+ACCOUNT_UNIQUE_EMAIL = True  # prevent duplicate emails
+SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
+
+
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'VERIFIED_EMAIL': True,
+    }
+}

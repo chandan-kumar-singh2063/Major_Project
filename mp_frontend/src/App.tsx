@@ -1,3 +1,4 @@
+// App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "./contexts/CartContext";
 import { ChatBotProvider } from "./contexts/ChatBotContext";
@@ -25,19 +26,30 @@ import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import SearchResults from "./components/SearchResults";
 import ProductDetailPage from "./components/ProductDetailPage";
 import PaymentSuccess from "./components/payment-success";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthModal from "./components/AuthModal";
 
-// Protected Route wrapper
+// -------------------- ProtectedRoute --------------------
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const token = localStorage.getItem("access");
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check localStorage for JWT token
+    const accessToken = localStorage.getItem("access");
+    setToken(accessToken);
+    setLoading(false);
+  }, []);
+
+  if (loading) return <div className="text-center mt-20 text-xl">Loading...</div>;
   if (!token) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
+// -------------------- Main App --------------------
 function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
@@ -46,6 +58,7 @@ function App() {
       <ChatBotProvider>
         <Router>
           <Routes>
+            {/* Protected Pages */}
             <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard/></ProtectedRoute>} />
             <Route path="/start-test" element={<ProtectedRoute><StartTest /></ProtectedRoute>} />
@@ -63,7 +76,7 @@ function App() {
             <Route path="/category/gadgets" element={<ProtectedRoute><Gadgets/></ProtectedRoute>} />
             <Route path="/category/home_decor" element={<ProtectedRoute><HomeDecor/></ProtectedRoute>} />
 
-            {/* Auth / Login Pages */}
+            {/* Auth Pages */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
@@ -78,6 +91,7 @@ function App() {
             <Route path="*" element={<div className="text-center mt-20 text-2xl font-semibold">404 Not Found</div>} />
           </Routes>
 
+          {/* Global Components */}
           <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
           <ChatBot />
         </Router>
