@@ -19,10 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env.local file
 env_path = BASE_DIR / '.env.local'
-print(f"🔍 Loading environment from: {env_path}")
-print(f"📁 File exists: {env_path.exists()}")
+
 load_dotenv(env_path)
-print(f"🔑 KHALTI_SECRET_KEY loaded: {os.getenv('KHALTI_SECRET_KEY', 'NOT FOUND')}")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
