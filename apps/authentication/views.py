@@ -26,6 +26,7 @@ import requests
 class UserRegistrationSerializer(ModelSerializer):
     password = CharField(write_only=True)
     email = EmailField(required=True)
+    username = CharField(required=True, max_length=150)  # Override to remove default validators
 
     class Meta:
         model = User
@@ -40,6 +41,11 @@ class UserRegistrationSerializer(ModelSerializer):
         return user
 
     def validate_username(self, value):
+        # Allow any characters in username (including spaces)
+        if not value or len(value.strip()) == 0:
+            raise ValidationError('Username cannot be empty')
+        if len(value) > 150:
+            raise ValidationError('Username is too long (max 150 characters)')
         if User.objects.filter(username=value).exists():
             raise ValidationError('Username already exists')
         return value

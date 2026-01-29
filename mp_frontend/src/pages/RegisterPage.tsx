@@ -29,8 +29,21 @@ const RegisterPage = () => {
       await authAPI.register({ ...form, recaptcha_token: recaptchaToken });
       setSuccess('Registration successful! Please login.');
       setTimeout(() => navigate('/login'), 1200);
-    } catch {
-      setError('Registration failed');
+    } catch (err: any) {
+      console.error("Registration Error:", err.response?.data);
+      let errorMsg = 'Registration failed';
+
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (data.non_field_errors) errorMsg = data.non_field_errors[0];
+        else if (data.detail) errorMsg = data.detail;
+        else if (data.email) errorMsg = `Email: ${data.email[0]}`;
+        else if (data.username) errorMsg = `Username: ${data.username[0]}`;
+        else if (data.password) errorMsg = `Password: ${data.password[0]}`;
+        else if (data.recaptcha_token) errorMsg = `reCAPTCHA: ${data.recaptcha_token[0]}`;
+      }
+
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -92,4 +105,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage; 
+export default RegisterPage;

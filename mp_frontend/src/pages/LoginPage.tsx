@@ -8,7 +8,7 @@ import { GoogleLogin } from "@react-oauth/google";
 axios.defaults.withCredentials = true;
 
 const LoginPage = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // Changed from username to email
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,17 +22,30 @@ const LoginPage = () => {
     setError(null);
 
     try {
+      // Send both email and username (as email) to satisfy backend
       const res = await axios.post(
-        "http://localhost:8000/api/auth/login/",  // Changed from /auth/login/ to /api/auth/login/
-        { username, password }
+        "http://localhost:8000/api/auth/login/",
+        {
+          email: email,
+          password: password
+        }
       );
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
 
+      // Save user info if available
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+
       navigate("/");
     } catch (err: any) {
-      setError("Invalid username or password");
+      console.error("Login Error:", err.response?.data);
+      const errorMsg = err.response?.data?.non_field_errors?.[0]
+        || err.response?.data?.detail
+        || "Invalid email or password";
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -66,12 +79,12 @@ const LoginPage = () => {
       navigate("/");
     } catch (err: any) {
       console.error("❌ Google login error:", err.response?.data);
-      
-      const errorMsg = err.response?.data?.non_field_errors?.[0] 
-        || err.response?.data?.detail 
+
+      const errorMsg = err.response?.data?.non_field_errors?.[0]
+        || err.response?.data?.detail
         || err.response?.data?.error
         || "Google login failed";
-      
+
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -89,10 +102,10 @@ const LoginPage = () => {
 
         <form onSubmit={handleLogin} className="mb-4">
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email Address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full mb-2 px-3 py-2 border rounded"
             required
           />

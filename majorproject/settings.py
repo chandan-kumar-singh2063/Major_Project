@@ -301,6 +301,8 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "optional"  # optional verification
 ACCOUNT_UNIQUE_EMAIL = True  # prevent duplicate emails
 SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_AUTHENTICATION_METHOD = 'email' # Reverted to email only
+ACCOUNT_USERNAME_REQUIRED = False # Explicitly disable username requirement
 
 
 
