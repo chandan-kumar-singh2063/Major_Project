@@ -70,7 +70,7 @@ SITE_ID = 2
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    
+    "http://192.168.10.91:5173",
 ]
 
 
@@ -234,6 +234,8 @@ DEFAULT_FROM_EMAIL = "e-pasal <yadavnigam72@gmail.com>"
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://192.168.10.91:5173",
+    "http://192.168.10.91:8000",
 ]
 
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
