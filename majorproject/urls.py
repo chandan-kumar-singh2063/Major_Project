@@ -37,6 +37,7 @@ urlpatterns = [
     path('auth/', include('allauth.socialaccount.urls')),
     path('auth/google/', csrf_exempt(CustomGoogleLogin.as_view()), name='google_login'),
     path('api/payment/', include('apps.payment.urls')),
+    path('api/wishlist/', include('apps.wishlist.urls')),
 ]
 
 # Serve media and static files in development

@@ -39,7 +39,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.contenttypes', 
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'apps.orders',
     'apps.categories',
     'apps.payment',
+    'apps.wishlist',
     'import_export',
     'django.contrib.sites',
     'allauth',
@@ -71,6 +72,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://192.168.10.91:5173",
+    "http://192.168.10.67:5173",
 ]
 
 
@@ -235,7 +237,11 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://192.168.10.91:5173",
+    "http://192.168.10.67:5173",
     "http://192.168.10.91:8000",
+    "http://192.168.10.67:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
 ]
 
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
