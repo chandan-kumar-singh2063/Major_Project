@@ -260,4 +260,4 @@ def payment_success(request):
     </html>
     """
     
-    return HttpResponse(html_content, content_type='text/html')
+    return HttpResponse(html_content, content_type='text/html') 
