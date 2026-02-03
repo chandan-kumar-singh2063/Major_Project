@@ -57,6 +57,7 @@ def initiate_khalti_payment(request):
         }
         
         print(f"📡 Sending to Khalti: {payload}")
+        print(f"🔑 Using Key: {khalti_secret_key[:5]}...{khalti_secret_key[-5:] if len(khalti_secret_key) > 5 else ''}")
         
         khalti_response = requests.post(
             "https://dev.khalti.com/api/v2/epayment/initiate/",

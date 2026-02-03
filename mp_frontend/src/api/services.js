@@ -82,4 +82,6 @@ export const authAPI = {
 // Orders API
 export const ordersAPI = {
   getMyOrders: () => api.get('/orders/my/'),
+  createOrder: (data) => api.post('/orders/', data),
+  getById: (id) => api.get(`/orders/${id}/`),
 };

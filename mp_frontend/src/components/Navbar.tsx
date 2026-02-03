@@ -44,7 +44,7 @@ export default function Navbar() {
   const [searchMode, setSearchMode] = useState<'text' | 'image'>('text');
   const [searchImage, setSearchImage] = useState<File | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading , setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Camera functionality states
@@ -68,7 +68,7 @@ export default function Navbar() {
     try {
       stopCamera(); // Stop any existing stream
       const constraints = {
-        video: { 
+        video: {
           facingMode: cameraMode,
           width: { ideal: 1280 },
           height: { ideal: 720 }
@@ -105,14 +105,14 @@ export default function Navbar() {
       if (context) {
         const width = videoRef.current.videoWidth;
         const height = videoRef.current.videoHeight;
-        
+
         canvasRef.current.width = width;
         canvasRef.current.height = height;
         context.drawImage(videoRef.current, 0, 0, width, height);
-        
+
         canvasRef.current.toBlob((blob) => {
           if (blob) {
-            const file = new File([blob], 'capture.jpg', { 
+            const file = new File([blob], 'capture.jpg', {
               type: 'image/jpeg',
               lastModified: Date.now()
             });
@@ -189,11 +189,11 @@ export default function Navbar() {
         });
 
         // Step 4: Navigate to results page
-        navigate("/search-results", { 
-          state: { 
-            results: mergedResults, 
-            searchType: "image" 
-          } 
+        navigate("/search-results", {
+          state: {
+            results: mergedResults,
+            searchType: "image"
+          }
         });
       } else {
         alert("No similar products found.");
@@ -214,7 +214,7 @@ export default function Navbar() {
     try {
       // Show loading state
       setLoading(true);
-      
+
       // Use the enhanced search API with pagination
       const response = await axios.get(`http://localhost:8000/api/products/search/`, {
         params: {
@@ -223,18 +223,18 @@ export default function Navbar() {
           page_size: 50 // Get more results for better search experience
         }
       });
-      
+
       const searchResults = response.data.results || response.data;
-      
+
       if (searchResults && searchResults.length > 0) {
         // Navigate to search results with enhanced data
-        navigate("/search-results", { 
-          state: { 
+        navigate("/search-results", {
+          state: {
             results: searchResults,
             searchQuery: searchQuery.trim(),
             searchType: 'text',
             totalResults: response.data.count || searchResults.length
-          } 
+          }
         });
       } else {
         // Show no results message
@@ -269,7 +269,7 @@ export default function Navbar() {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
+
     if (searchMode === 'text' && value.trim()) {
       setShowSuggestions(true);
     } else {
@@ -337,84 +337,84 @@ export default function Navbar() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="sticky top-0 z-50 bg-white/30 dark:bg-black/30 backdrop-blur-lg shadow-md transition"
       >
-                  <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
           <Link to="/" className="flex items-center gap-2 text-3xl font-bold tracking-tight text-black dark:text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
             <Store size={32} />e-pasal
           </Link>
 
           {/* Search Bar */}
-              <div className="flex items-center relative w-full max-w-lg">
-                <div className={`w-full flex items-center rounded-full border ${searchMode === 'image' ? 'border-gray-300 dark:border-gray-600' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-900`}>
-                  <input
-                    type={searchMode === 'text' ? 'text' : 'file'}
-                    accept={searchMode === 'image' ? 'image/*' : undefined}
-                    placeholder={searchMode === 'text' ? 'Search products...' : ''}
-                    value={searchMode === 'text' ? searchQuery : undefined}
-                    onChange={(e) => 
-                      searchMode === 'text' 
-                        ? handleSearchChange(e)
-                        : handleFileUpload(e)
-                    }
-                    onFocus={handleSearchFocus}
-                    onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
-                    ref={fileInputRef}
-                    className={`w-full py-2 px-4 bg-transparent text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition ${searchMode === 'image' ? 'hidden' : 'block'}`}
-                  />
-                  {searchMode === 'image' && searchImage ? (
-                    <div className="w-full py-2 px-4 flex items-center gap-2">
-                      <CheckCircle className="text-green-500" size={18} />
-                      <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-xs">
-                        {searchImage.name}
-                      </span>
-                    </div>
-                  ) : searchMode === 'image' ? (
-                    <div className="w-full py-2 px-4 text-sm text-gray-400 dark:text-gray-500">
-                      Click to upload or take photo
-                    </div>
-                  ) : null}
+          <div className="flex items-center relative w-full max-w-lg">
+            <div className={`w-full flex items-center rounded-full border ${searchMode === 'image' ? 'border-gray-300 dark:border-gray-600' : 'border-gray-300 dark:border-gray-600'} bg-white dark:bg-gray-900`}>
+              <input
+                type={searchMode === 'text' ? 'text' : 'file'}
+                accept={searchMode === 'image' ? 'image/*' : undefined}
+                placeholder={searchMode === 'text' ? 'Search products...' : ''}
+                value={searchMode === 'text' ? searchQuery : undefined}
+                onChange={(e) =>
+                  searchMode === 'text'
+                    ? handleSearchChange(e)
+                    : handleFileUpload(e)
+                }
+                onFocus={handleSearchFocus}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+                ref={fileInputRef}
+                className={`w-full py-2 px-4 bg-transparent text-sm text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary transition ${searchMode === 'image' ? 'hidden' : 'block'}`}
+              />
+              {searchMode === 'image' && searchImage ? (
+                <div className="w-full py-2 px-4 flex items-center gap-2">
+                  <CheckCircle className="text-green-500" size={18} />
+                  <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-xs">
+                    {searchImage.name}
+                  </span>
                 </div>
-                
-                {/* Search Suggestions */}
-                <SearchSuggestions
-                  query={searchQuery}
-                  isVisible={showSuggestions}
-                  onSelectSuggestion={handleSuggestionSelect}
-                  onClose={() => setShowSuggestions(false)}
-                />
-                
-                <div className="absolute right-2 flex items-center gap-2">
-                  <motion.button
-                    onClick={() => {
-                      setSearchMode('text');
-                      setSearchImage(null);
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    className={`px-3 py-1 rounded-full text-sm transition ${searchMode === 'text' ? 'bg-gray-900 text-white shadow' : 'bg-gray-200 dark:bg-black text-gray-600 dark:text-white'}`}
-                  >
-                    Text
-                  </motion.button>
-                  <motion.button
-                    onClick={() => {
-                      setSearchMode('image');
-                      setShowImageOptions(true);
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    className={`px-3 py-1 rounded-full text-sm flex items-center transition ${searchMode === 'image' ? 'bg-gray-900 text-white shadow' : 'bg-gray-200 dark:bg-black text-gray-600 dark:text-gray-300'}`}
-                  >
-                    <Camera size={16} className="mr-1" />
-                    Image
-                  </motion.button>
+              ) : searchMode === 'image' ? (
+                <div className="w-full py-2 px-4 text-sm text-gray-400 dark:text-gray-500">
+                  Click to upload or take photo
+                </div>
+              ) : null}
+            </div>
 
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    className="p-2 bg-primary text-white rounded-full shadow hover:bg-primary/90 transition"
-                    onClick={handleSearch}
-                    disabled={(searchMode === 'image' && !searchImage) || (searchMode === 'text' && !searchQuery.trim())}
-                  >
-                    <Search size={18} />
-                  </motion.button>
-                </div>
-              </div>
+            {/* Search Suggestions */}
+            <SearchSuggestions
+              query={searchQuery}
+              isVisible={showSuggestions}
+              onSelectSuggestion={handleSuggestionSelect}
+              onClose={() => setShowSuggestions(false)}
+            />
+
+            <div className="absolute right-2 flex items-center gap-2">
+              <motion.button
+                onClick={() => {
+                  setSearchMode('text');
+                  setSearchImage(null);
+                }}
+                whileHover={{ scale: 1.05 }}
+                className={`px-3 py-1 rounded-full text-sm transition ${searchMode === 'text' ? 'bg-gray-900 text-white shadow' : 'bg-gray-200 dark:bg-black text-gray-600 dark:text-white'}`}
+              >
+                Text
+              </motion.button>
+              <motion.button
+                onClick={() => {
+                  setSearchMode('image');
+                  setShowImageOptions(true);
+                }}
+                whileHover={{ scale: 1.05 }}
+                className={`px-3 py-1 rounded-full text-sm flex items-center transition ${searchMode === 'image' ? 'bg-gray-900 text-white shadow' : 'bg-gray-200 dark:bg-black text-gray-600 dark:text-gray-300'}`}
+              >
+                <Camera size={16} className="mr-1" />
+                Image
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                className="p-2 bg-primary text-white rounded-full shadow hover:bg-primary/90 transition"
+                onClick={handleSearch}
+                disabled={(searchMode === 'image' && !searchImage) || (searchMode === 'text' && !searchQuery.trim())}
+              >
+                <Search size={18} />
+              </motion.button>
+            </div>
+          </div>
 
           {/* Right Navigation */}
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
@@ -480,8 +480,10 @@ export default function Navbar() {
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 z-50 min-w-[120px]">
                     <Link to="/profile" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Profile</Link>
+                    <Link to="/orders" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">My Orders</Link>
                     <button className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500" onClick={handleLogout}>Logout</button>
                   </div>
+
                 )}
               </div>
             ) : (
@@ -541,16 +543,16 @@ export default function Navbar() {
               className="md:hidden px-4 pb-5 pt-2 bg-white dark:bg-black space-y-3"
             >
               {categories.map((cat) => (
-                <Link 
-                  key={cat} 
-                  to={`/category/${cat.toLowerCase()}`} 
+                <Link
+                  key={cat}
+                  to={`/category/${cat.toLowerCase()}`}
                   className="block text-gray-800 dark:text-gray-200 hover:text-primary transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {cat}
                 </Link>
               ))}
-              <button 
+              <button
                 onClick={() => {
                   setIsFeedbackOpen(true);
                   setIsMenuOpen(false);
@@ -576,15 +578,15 @@ export default function Navbar() {
                     </button>
                     {showProfileMenu && (
                       <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 z-50 min-w-[120px]">
-                        <Link 
-                          to="/profile" 
+                        <Link
+                          to="/profile"
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           Profile
                         </Link>
-                        <button 
-                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500" 
+                        <button
+                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500"
                           onClick={() => {
                             handleLogout();
                             setIsMenuOpen(false);
@@ -606,11 +608,11 @@ export default function Navbar() {
                     <User className="text-gray-700 dark:text-gray-300" size={20} />
                   </button>
                 )}
-                <button 
+                <button
                   onClick={() => {
                     setIsCartOpen(true);
                     setIsMenuOpen(false);
-                  }} 
+                  }}
                   className="relative text-gray-800 dark:text-gray-100"
                 >
                   <ShoppingCart size={22} />

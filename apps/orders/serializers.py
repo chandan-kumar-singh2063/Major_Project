@@ -15,12 +15,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
     user = serializers.StringRelatedField(read_only=True)
-    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='user', write_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='user', write_only=True, required=False)
+
 
     class Meta:
         model = Order
         fields = [
             'id', 'user', 'user_id', 'created_at', 'updated_at', 'status',
-            'shipping_address', 'total_price', 'items'
+            'shipping_address', 'total_price', 'items', 'transaction_id'
         ]
-        read_only_fields = ['created_at', 'updated_at', 'user', 'items']
+
+        read_only_fields = ['created_at', 'updated_at', 'user', 'items', 'total_price']
