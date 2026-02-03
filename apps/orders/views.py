@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, permissions, serializers, status
 
 from .models import Order, OrderItem
@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.cart.models import Cart, CartItem
 from django.db import transaction
+import datetime
 
 # Create your views here.
 
@@ -20,33 +21,38 @@ class OrderViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_create(self, serializer):
         user = self.request.user
+        print(f"📦 [{datetime.datetime.now()}] Creating order for user: {user.username}")
+        print(f"📦 Request data: {self.request.data}")
         
-        # Idempotency check: Don't create duplicate orders for the same transaction
-        transaction_id = serializer.validated_data.get('transaction_id')
+        # Idempotency check
+        transaction_id = self.request.data.get('transaction_id')
         if transaction_id and Order.objects.filter(user=user, transaction_id=transaction_id).exists():
+            print(f"⚠️ Order with transaction_id {transaction_id} already exists. Skipping.")
             return 
 
-        # Handle "Buy Now" (Single product purchase that bypasses the cart)
         buy_now_product_id = self.request.data.get('buy_now_product_id')
         
         if buy_now_product_id:
+            print(f"🔥 Buy Now Flow for product index: {buy_now_product_id}")
             from apps.products.models import Product
             product = get_object_or_404(Product, id=buy_now_product_id)
-            order = serializer.save(user=user, total_price=product.price)
+            order = serializer.save(user=user, total_price=product.price, status='ordered')
             OrderItem.objects.create(
                 order=order,
                 product=product,
                 quantity=1,
                 price=product.price
             )
+            print(f"✅ Buy Now order #{order.id} created successfully")
         else:
-            # Traditional Cart-to-Order flow
+            print(f"🛒 Cart Checkout Flow")
             cart = Cart.objects.filter(user=user).first()
             if not cart or not cart.items.exists():
+                print(f"❌ Cart is empty for user {user.username}")
                 raise serializers.ValidationError('Cart is empty.')
             
-            # Initial save to get order ID
-            order = serializer.save(user=user)
+            # Initial save
+            order = serializer.save(user=user, status='ordered')
 
             total = 0
             for item in cart.items.all():
@@ -57,12 +63,14 @@ class OrderViewSet(viewsets.ModelViewSet):
                     price=item.product.price
                 )
                 total += item.product.price * item.quantity
+                print(f"   ➕ Added {item.quantity}x {item.product.name}")
             
             order.total_price = total
             order.save()
             
-            # Clear cart after successful order
+            # Clear cart
             cart.items.all().delete()
+            print(f"✅ Cart-to-Order #{order.id} created successfully for Rs. {total}. Cart cleared.")
 
     @action(detail=False, methods=['get'], url_path='my')
     def my_orders(self, request):
