@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions, serializers
+from rest_framework import viewsets, permissions, serializers, status
+
 from .models import Order, OrderItem
 from .serializers import OrderSerializer, OrderItemSerializer
 from rest_framework.decorators import action
@@ -19,28 +20,68 @@ class OrderViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_create(self, serializer):
         user = self.request.user
-        cart = Cart.objects.filter(user=user).first()
-        if not cart or not cart.items.exists():
-            raise serializers.ValidationError('Cart is empty.')
-        order = serializer.save(user=user)
-        total = 0
-        for item in cart.items.all():
+        
+        # Idempotency check: Don't create duplicate orders for the same transaction
+        transaction_id = serializer.validated_data.get('transaction_id')
+        if transaction_id and Order.objects.filter(user=user, transaction_id=transaction_id).exists():
+            return 
+
+        # Handle "Buy Now" (Single product purchase that bypasses the cart)
+        buy_now_product_id = self.request.data.get('buy_now_product_id')
+        
+        if buy_now_product_id:
+            from apps.products.models import Product
+            product = get_object_or_404(Product, id=buy_now_product_id)
+            order = serializer.save(user=user, total_price=product.price)
             OrderItem.objects.create(
                 order=order,
-                product=item.product,
-                quantity=item.quantity,
-                price=item.product.price
+                product=product,
+                quantity=1,
+                price=product.price
             )
-            total += item.product.price * item.quantity
-        order.total_price = total
-        order.save()
-        cart.items.all().delete()
+        else:
+            # Traditional Cart-to-Order flow
+            cart = Cart.objects.filter(user=user).first()
+            if not cart or not cart.items.exists():
+                raise serializers.ValidationError('Cart is empty.')
+            
+            # Initial save to get order ID
+            order = serializer.save(user=user)
+
+            total = 0
+            for item in cart.items.all():
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price
+                )
+                total += item.product.price * item.quantity
+            
+            order.total_price = total
+            order.save()
+            
+            # Clear cart after successful order
+            cart.items.all().delete()
 
     @action(detail=False, methods=['get'], url_path='my')
     def my_orders(self, request):
-        orders = self.get_queryset()
+        orders = self.get_queryset().order_by('-created_at')
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        order = self.get_object()
+        if order.status not in ['ordered', 'pending']:
+            return Response(
+                {"error": f"Cannot cancel order with status '{order.status}'."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        order.status = 'cancelled'
+        order.save()
+        return Response({"status": "order cancelled"})
+
 
 class OrderItemViewSet(viewsets.ModelViewSet):
     serializer_class = OrderItemSerializer

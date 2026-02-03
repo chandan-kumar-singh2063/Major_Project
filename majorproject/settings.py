@@ -282,6 +282,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'access_type': 'online',
         },
         'OAUTH_PKCE_ENABLED': True,
+        'VERIFIED_EMAIL': True,
         'APP': {
             'client_id': os.getenv('GOOGLE_OAUTH_CLIENT_ID', '379736466398-bskn351unl206g2fmseqbf3odmnaej68.apps.googleusercontent.com'),
             'secret': os.getenv('GOOGLE_OAUTH_CLIENT_SECRET', ''),
@@ -314,16 +315,3 @@ ACCOUNT_USERNAME_REQUIRED = False # Explicitly disable username requirement
 
 
 
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'VERIFIED_EMAIL': True,
-    }
-}

@@ -79,17 +79,15 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
 
   return (
     <div
-      className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-200 ${
-        isOpen ? "opacity-100" : "opacity-0"
-      }`}
+      className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-200 ${isOpen ? "opacity-100" : "opacity-0"
+        }`}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden transform transition-all duration-200 ${
-          isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"
-        }`}
+        className={`bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md max-h-[80vh] overflow-hidden transform transition-all duration-200 ${isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-4"
+          }`}
       >
         {/* HEADER */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -136,6 +134,13 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                   key={item.id}
                   className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
+                  <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-600">
+                    <img
+                      src={item.product_image || "/placeholder.png"}
+                      alt={item.product_name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium truncate">
                       {item.product_name}

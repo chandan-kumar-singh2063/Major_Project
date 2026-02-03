@@ -21,6 +21,7 @@ from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
 from allauth.socialaccount.models import SocialApp
 import requests
+from .models import Profile
 
 # User Registration Serializer
 class UserRegistrationSerializer(ModelSerializer):
@@ -116,9 +117,36 @@ class UserRegistrationView(generics.CreateAPIView):
 
 # User Profile Serializer
 class UserProfileSerializer(ModelSerializer):
+    address = CharField(source='profile.address', allow_blank=True, required=False)
+    phone_number = CharField(source='profile.phone_number', allow_blank=True, required=False)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'address', 'phone_number']
+
+    def update(self, instance, validated_data):
+        # Extract profile data nested by source='profile.address/phone_number'
+        profile_data = validated_data.pop('profile', {})
+        address = profile_data.get('address')
+        phone_number = profile_data.get('phone_number')
+
+        # Update User fields
+        instance.username = validated_data.get('username', instance.username)
+        instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
+
+        # Update or create Profile fields
+        profile, created = Profile.objects.get_or_create(user=instance)
+        if address is not None:
+            profile.address = address
+        if phone_number is not None:
+            profile.phone_number = phone_number
+        profile.save()
+
+        return instance
+
 
 
 # User Profile View
@@ -135,6 +163,7 @@ class UserProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # Password Change View

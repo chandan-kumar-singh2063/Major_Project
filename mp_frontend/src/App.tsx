@@ -24,7 +24,9 @@ import RegisterPage from './pages/RegisterPage';
 import ResetPasswordRequestPage from './pages/ResetPasswordRequestPage';
 import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import OrdersPage from "./pages/OrdersPage";
+import WishlistPage from "./pages/WishlistPage";
 import SearchResults from "./components/SearchResults";
+
 import ProductDetailPage from "./components/ProductDetailPage";
 import PaymentSuccess from "./components/payment-success";
 import { useState, useEffect } from "react";
@@ -87,7 +89,9 @@ function App() {
             <Route path="/product/:id" element={<ProtectedRoute><ProductDetailPage /></ProtectedRoute>} />
             <Route path="/search-results" element={<ProtectedRoute><SearchResults /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
             <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+
 
             {/* 404 */}
             <Route path="*" element={<div className="text-center mt-20 text-2xl font-semibold">404 Not Found</div>} />

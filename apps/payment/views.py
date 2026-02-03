@@ -41,7 +41,7 @@ def initiate_khalti_payment(request):
         print(f"🔗 Return URL: {return_url}")
         print(f"🌐 Website URL: {website_url}")
         
-        purchase_order_id = f"order-{int(datetime.now().timestamp() * 1000)}"
+        purchase_order_id = data.get('purchase_order_id') or f"order-{int(datetime.now().timestamp() * 1000)}"
         
         payload = {
             "return_url": return_url,

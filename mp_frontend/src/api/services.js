@@ -79,9 +79,17 @@ export const authAPI = {
   },
 };
 
+// Wishlist API
+export const wishlistAPI = {
+  get: () => api.get('/wishlist/'),
+  add: (productId) => api.post('/wishlist/add/', { product: productId }),
+  remove: (productId) => api.delete(`/wishlist/remove/${productId}/`),
+};
+
 // Orders API
 export const ordersAPI = {
   getMyOrders: () => api.get('/orders/my/'),
   createOrder: (data) => api.post('/orders/', data),
   getById: (id) => api.get(`/orders/${id}/`),
+  cancelOrder: (id) => api.post(`/orders/${id}/cancel/`),
 };

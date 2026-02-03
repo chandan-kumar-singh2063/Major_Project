@@ -1,9 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authAPI } from '@/api/services';
+import { authAPI, ordersAPI } from '@/api/services';
+import { Package, Clock, CheckCircle, XCircle, ArrowRight } from 'lucide-react';
+
+interface Order {
+  id: number;
+  created_at: string;
+  status: string;
+  total_price: string;
+  items: any[];
+}
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<any>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -19,11 +29,20 @@ const ProfilePage = () => {
       navigate('/');
       return;
     }
-    authAPI.getProfile()
-      .then((res: any) => setProfile(res.data))
-      .catch(() => setError('Failed to load profile'))
+
+    Promise.all([
+      authAPI.getProfile(),
+      ordersAPI.getMyOrders()
+    ])
+      .then(([profileRes, ordersRes]: [any, any]) => {
+        setProfile(profileRes.data);
+        setOrders(ordersRes.data.slice(0, 5));
+      })
+      .catch(() => setError('Failed to load profile data'))
       .finally(() => setLoading(false));
   }, [navigate]);
+
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -38,10 +57,13 @@ const ProfilePage = () => {
       setSuccess('Profile updated!');
       setEditProfile(false);
       setTimeout(() => setSuccess(null), 1500);
-    } catch {
-      setError('Failed to update profile');
+    } catch (err: any) {
+      console.error('Failed to update profile:', err);
+      setError(err?.response?.data?.error || err?.response?.data?.detail || 'Failed to update profile');
+      setTimeout(() => setError(null), 3000);
     }
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('access');
@@ -86,8 +108,9 @@ const ProfilePage = () => {
           <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium bg-primary/10 text-primary">Profile</button>
           <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium text-gray-700 dark:text-gray-200" onClick={() => navigate('/orders')}>My Orders</button>
           <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium text-gray-700 dark:text-gray-200" disabled>My Reviews</button>
-          <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium text-gray-700 dark:text-gray-200" disabled>My Wishlist</button>
+          <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium text-gray-700 dark:text-gray-200" onClick={() => navigate('/wishlist')}>My Wishlist</button>
           <button className="text-left px-3 py-2 rounded hover:bg-primary/10 font-medium text-gray-700 dark:text-gray-200" disabled>My Returns</button>
+
           <button className="text-left px-3 py-2 rounded hover:bg-red-100 text-red-600 font-medium mt-8" onClick={handleLogout}>Logout</button>
         </nav>
       </aside>
@@ -109,6 +132,8 @@ const ProfilePage = () => {
                 <input type="email" name="email" value={profile?.email || ''} onChange={handleChange} className="px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600" required />
                 <input type="text" name="first_name" placeholder="First Name" value={profile?.first_name || ''} onChange={handleChange} className="px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
                 <input type="text" name="last_name" placeholder="Last Name" value={profile?.last_name || ''} onChange={handleChange} className="px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
+                <input type="text" name="phone_number" placeholder="Phone Number" value={profile?.phone_number || ''} onChange={handleChange} className="px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
+                <textarea name="address" placeholder="Shipping Address" value={profile?.address || ''} onChange={(e: any) => setProfile({ ...profile, address: e.target.value })} className="px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 min-h-[100px]" />
                 <button type="submit" className="bg-primary text-white py-2 rounded font-semibold hover:bg-primary/90 transition shadow-md">Save Changes</button>
               </form>
             ) : (
@@ -116,7 +141,8 @@ const ProfilePage = () => {
                 <div className="flex justify-between border-b border-gray-50 dark:border-gray-700 pb-2"><span className="font-medium">Username:</span> {profile?.username}</div>
                 <div className="flex justify-between border-b border-gray-50 dark:border-gray-700 pb-2"><span className="font-medium">Email:</span> {profile?.email}</div>
                 <div className="flex justify-between border-b border-gray-50 dark:border-gray-700 pb-2"><span className="font-medium">First Name:</span> {profile?.first_name || '-'}</div>
-                <div className="flex justify-between"><span className="font-medium">Last Name:</span> {profile?.last_name || '-'}</div>
+                <div className="flex justify-between border-b border-gray-50 dark:border-gray-700 pb-2"><span className="font-medium">Last Name:</span> {profile?.last_name || '-'}</div>
+                <div className="flex justify-between"><span className="font-medium">Phone:</span> {profile?.phone_number || '-'}</div>
               </div>
             )}
           </div>
@@ -124,28 +150,82 @@ const ProfilePage = () => {
           {/* Address Book */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-100 dark:border-gray-700">
             <div className="flex justify-between items-center mb-4">
-              <div className="font-semibold text-lg text-gray-900 dark:text-white">Address Book</div>
-              <button className="text-primary underline hover:text-primary/80 transition" disabled>Edit</button>
+              <div className="font-semibold text-lg text-gray-900 dark:text-white">Shipping Address</div>
+              <button className="text-primary underline hover:text-primary/80 transition" onClick={() => setEditProfile(true)}>Edit</button>
             </div>
-            <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-              <p>No addresses found.</p>
-            </div>
+            {profile?.address ? (
+              <div className="text-gray-700 dark:text-gray-300">
+                <p className="font-medium mb-1">Default Address:</p>
+                <p className="whitespace-pre-wrap">{profile.address}</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-gray-400">
+                <p>No addresses found.</p>
+                <button className="text-primary text-sm mt-2 hover:underline" onClick={() => setEditProfile(true)}>Add Address</button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Recent Orders Section */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-100 dark:border-gray-700 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="font-semibold text-lg text-gray-900 dark:text-white">Recent Orders</div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-100 dark:border-gray-700 mb-8 transition-all duration-300">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-primary" />
+              <div className="font-bold text-xl text-gray-900 dark:text-white">Recent Orders</div>
+            </div>
             <button
               onClick={() => navigate('/orders')}
-              className="text-primary text-sm font-medium hover:underline"
+              className="group flex items-center gap-1 text-primary text-sm font-semibold hover:underline"
             >
-              View All
+              View All History
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
-          <p className="text-gray-500 py-4">Click "View All" to manage your complete order history.</p>
+
+          {orders.length > 0 ? (
+            <div className="space-y-4">
+              {orders.map((order) => (
+                <div key={order.id} className="flex flex-wrap items-center justify-between p-4 rounded-xl border border-gray-50 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                      #{order.id}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">Ordered {new Date(order.created_at).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-500">{order.items.length} items • Rs. {order.total_price}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${order.status.toLowerCase() === 'delivered' ? 'bg-green-100 text-green-700' :
+                      order.status.toLowerCase() === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        'bg-primary/10 text-primary'
+                      }`}>
+                      {order.status.toLowerCase() === 'delivered' ? <CheckCircle className="w-3 h-3" /> :
+                        order.status.toLowerCase() === 'cancelled' ? <XCircle className="w-3 h-3" /> :
+                          <Clock className="w-3 h-3" />}
+                      {order.status}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-500 font-medium">No orders found yet.</p>
+              <button
+                onClick={() => navigate('/')}
+                className="mt-4 text-primary font-semibold hover:underline"
+              >
+                Start Shopping
+              </button>
+            </div>
+          )}
         </div>
+
 
         {/* Change Password */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 max-w-lg border border-gray-100 dark:border-gray-700">

@@ -51,7 +51,11 @@ class ProductListCreateView(generics.ListCreateAPIView):
     pagination_class = ProductPagination
     
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
+        # Exclude products without ANY images (checked via main image field and related images)
+        queryset = Product.objects.filter(is_active=True).exclude(
+            Q(image='') | Q(image__isnull=True), 
+            images__isnull=True
+        ).distinct()
         
         # Filter by category
         category_id = self.request.query_params.get('category')
@@ -179,7 +183,11 @@ class ProductFilterView(generics.ListAPIView):
     pagination_class = ProductPagination
 
     def get_queryset(self):
-        queryset = Product.objects.filter(is_active=True)
+        # Apply same image filter to ensure consistency across search/filter results
+        queryset = Product.objects.filter(is_active=True).exclude(
+            Q(image='') | Q(image__isnull=True), 
+            images__isnull=True
+        ).distinct()
 
         # Category filter (safe for IDs and names)
         category = self.request.query_params.get('category')

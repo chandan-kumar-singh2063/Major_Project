@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import { ordersAPI } from '@/api/services';
+import { ordersAPI, authAPI } from '@/api/services';
+
 
 export default function PaymentSuccess() {
     const [searchParams] = useSearchParams();
@@ -16,36 +17,52 @@ export default function PaymentSuccess() {
     useEffect(() => {
         const details = {
             status: searchParams.get('status'),
-            transactionId: searchParams.get('transaction_id'),
+            transactionId: searchParams.get('transaction_id') || searchParams.get('idx') || searchParams.get('pidx'),
             amount: searchParams.get('amount'),
             totalAmount: searchParams.get('total_amount'),
-            purchaseOrderId: searchParams.get('purchase_order_id'),
+            purchaseOrderId: searchParams.get('purchase_order_id') || searchParams.get('purchaseOrderId'),
             purchaseOrderName: searchParams.get('purchase_order_name'),
-            pidx: searchParams.get('pidx'),
+            pidx: searchParams.get('pidx') || searchParams.get('idx'),
         };
         setTransactionDetails(details);
 
         // If payment is successful and we haven't created the order yet
         if (details.status === 'Completed' && !orderCreated.current) {
+            orderCreated.current = true;
             handleCreateOrder(details);
         }
     }, [searchParams]);
 
+
     const handleCreateOrder = async (details: any) => {
         setOrderCreating(true);
         try {
-            // Note: In typical flow, the shipping address might be passed from checkout state
-            // or fetched from a stored session/localstorage. 
-            // Here we use a placeholder or assume backend handles default if allowed.
-            const shippingAddress = "Remote (Paid via Khalti)"; // Placeholder
+            // Fetch profile to get saved address
+            let shippingAddress = "Remote (Paid via Khalti)";
+            try {
+                const profileRes = await authAPI.getProfile();
+                if (profileRes.data.address) {
+                    shippingAddress = profileRes.data.address;
+                }
+            } catch (profileErr) {
+                console.error("Failed to fetch profile in PaymentSuccess:", profileErr);
+            }
+
+            // Check if this was a "Buy Now" purchase
+            let buyNowProductId = null;
+            if (details.purchaseOrderId && String(details.purchaseOrderId).startsWith('BUY_NOW_')) {
+                // Assuming the format is BUY_NOW_PID where PID is the product ID
+                const parts = String(details.purchaseOrderId).split('_');
+                buyNowProductId = parseInt(parts[parts.length - 1]);
+            }
 
             await ordersAPI.createOrder({
                 shipping_address: shippingAddress,
                 transaction_id: details.transactionId,
-                status: 'ordered'
+                status: 'ordered',
+                ...(buyNowProductId && { buy_now_product_id: buyNowProductId })
             });
 
-            orderCreated.current = true;
             console.log("Order created successfully!");
         } catch (err) {
             console.error("Failed to create order:", err);
@@ -54,6 +71,7 @@ export default function PaymentSuccess() {
             setOrderCreating(false);
         }
     };
+
 
     const isSuccess = transactionDetails?.status === 'Completed';
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '@/api/services';
-import { Package, Clock, CheckCircle, XCircle, ChevronRight, MapPin } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, ChevronRight, MapPin, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -52,22 +53,36 @@ const OrdersPage = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+    const fetchOrders = async () => {
+        try {
+            const response = await ordersAPI.getMyOrders();
+            setOrders(response.data);
+        } catch (err) {
+            console.error('Failed to fetch orders:', err);
+            setError('Failed to load orders. Please try again later.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const response = await ordersAPI.getMyOrders();
-                setOrders(response.data);
-            } catch (err) {
-                console.error('Failed to fetch orders:', err);
-                setError('Failed to load orders. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchOrders();
     }, []);
+
+    const handleCancel = async (orderId: number) => {
+        if (!window.confirm('Are you sure you want to cancel this order?')) return;
+
+        try {
+            await ordersAPI.cancelOrder(orderId);
+            fetchOrders();
+        } catch (err) {
+            console.error('Failed to cancel order:', err);
+            alert('Failed to cancel order. It may have already been processed.');
+        }
+    };
+
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-black transition-colors duration-300">
@@ -75,6 +90,13 @@ const OrdersPage = () => {
 
             <main className="max-w-4xl mx-auto px-4 py-12">
                 <header className="mb-8">
+                    <button
+                        onClick={() => navigate('/profile')}
+                        className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-4"
+                    >
+                        <ArrowLeft size={16} />
+                        <span className="text-sm font-medium">Back to Profile</span>
+                    </button>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">My Orders</h1>
                     <p className="text-gray-600 dark:text-gray-400">Track and manage your recent purchases</p>
                 </header>
@@ -132,10 +154,20 @@ const OrdersPage = () => {
                                             </p>
                                         </div>
                                         <div className="flex flex-col items-end gap-2">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                                <StatusIcon status={order.status} />
-                                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                            </span>
+                                            <div className="flex flex-wrap items-center gap-3">
+                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${statusColors[order.status.toLowerCase()] || 'bg-gray-100 text-gray-800'}`}>
+                                                    <StatusIcon status={order.status.toLowerCase()} />
+                                                    <span className="capitalize">{order.status}</span>
+                                                </div>
+                                                {['ordered', 'pending'].includes(order.status.toLowerCase()) && (
+                                                    <button
+                                                        onClick={() => handleCancel(order.id)}
+                                                        className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:underline px-2 py-1"
+                                                    >
+                                                        Cancel Order
+                                                    </button>
+                                                )}
+                                            </div>
                                             <p className="text-xl font-bold text-primary">Rs. {order.total_price}</p>
                                         </div>
                                     </div>
