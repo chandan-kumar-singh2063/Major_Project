@@ -102,16 +102,43 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
+    @transaction.atomic
     def cancel(self, request, pk=None):
         order = self.get_object()
-        if order.status not in ['ordered', 'pending']:
+        
+        # Prevent double cancellation or cancelling shipped/delivered orders
+        if order.status == 'cancelled':
+            return Response({"message": "Order is already cancelled."}, status=status.HTTP_200_OK)
+            
+        if order.status not in ['ordered', 'pending', 'processing']:
             return Response(
-                {"error": f"Cannot cancel order with status '{order.status}'."},
+                {"error": f"Cannot cancel order with status '{order.status}'. Only new orders can be cancelled."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        print(f"DEBUG: ↩️ Restocking products for cancelled order #{order.id}")
+        
+        # Restock each item in the order
+        for item in order.items.all():
+            product = item.product
+            product.stock += item.quantity
+            
+            # Reduce purchase count to keep stats clean
+            if product.purchase_count >= item.quantity:
+                product.purchase_count -= item.quantity
+            else:
+                product.purchase_count = 0
+                
+            product.save()
+            print(f"DEBUG: 📈 Restocked {item.quantity} units of '{product.name}' (New stock: {product.stock})")
+
         order.status = 'cancelled'
         order.save()
-        return Response({"status": "order cancelled"})
+        
+        return Response({
+            "status": "success",
+            "message": "Order cancelled successfully and products have been restocked."
+        })
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
