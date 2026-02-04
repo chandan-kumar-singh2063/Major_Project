@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import { useCart } from "@/contexts/CartContext";
 
 // Configure axios globally
 axios.defaults.withCredentials = true;
@@ -14,6 +15,7 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const { refreshCart } = useCart();
 
   // --------------------- Normal Login ---------------------
   const handleLogin = async (e: React.FormEvent) => {
@@ -33,6 +35,9 @@ const LoginPage = () => {
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
+
+      // Refresh cart data immediately after login
+      await refreshCart();
 
       // Save user info if available
       if (res.data.user) {
@@ -75,6 +80,9 @@ const LoginPage = () => {
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
+
+      // Refresh cart data immediately after login
+      await refreshCart();
 
       navigate("/");
     } catch (err: any) {

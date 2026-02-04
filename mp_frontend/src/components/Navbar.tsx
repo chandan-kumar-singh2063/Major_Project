@@ -38,7 +38,7 @@ export default function Navbar() {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
-  const { cartCount } = useCart();
+  const { cartCount, refreshCart } = useCart();
 
   // Search functionality states
   const [searchMode, setSearchMode] = useState<'text' | 'image'>('text');
@@ -56,7 +56,7 @@ export default function Navbar() {
   const [capturedImageUrl, setCapturedImageUrl] = useState<string | null>(null);
 
   // User authentication state
-  const [user, setUser] = useState<{ username: string } | null>(null);
+  const [user, setUser] = useState<{ username: string, role?: string } | null>(null);
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -284,10 +284,15 @@ export default function Navbar() {
       authAPI.getProfile()
         .then((res: any) => setUser(res.data))
         .catch(() => setUser(null));
+
+      // Refresh cart when token is present or auth modal closes
+      refreshCart();
     } else {
       setUser(null);
+      // Also refresh cart to clear it if logged out
+      refreshCart();
     }
-  }, [isAuthOpen]);
+  }, [isAuthOpen, refreshCart]);
 
   const handleLogout = () => {
     localStorage.removeItem('access');
@@ -310,8 +315,19 @@ export default function Navbar() {
     }
   }, [showCameraModal, cameraMode]);
 
-  // Cleanup effects
   useEffect(() => {
+    // Check for saved theme in localStorage OR system preference
+    const savedTheme = localStorage.getItem('theme');
+    const isDarkMode = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+
     return () => {
       stopCamera();
       if (capturedImageUrl) {
@@ -409,9 +425,13 @@ export default function Navbar() {
                 whileHover={{ scale: 1.1 }}
                 className="p-2 bg-primary text-white rounded-full shadow hover:bg-primary/90 transition"
                 onClick={handleSearch}
-                disabled={(searchMode === 'image' && !searchImage) || (searchMode === 'text' && !searchQuery.trim())}
+                disabled={(searchMode === 'image' && !searchImage) || (searchMode === 'text' && !searchQuery.trim()) || loading}
               >
-                <Search size={18} />
+                {loading ? (
+                  <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Search size={18} />
+                )}
               </motion.button>
             </div>
           </div>
@@ -480,6 +500,9 @@ export default function Navbar() {
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 z-50 min-w-[120px]">
                     <Link to="/profile" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Profile</Link>
+                    {user.role === 'seller' && (
+                      <Link to="/seller-dashboard" className="block w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold">Seller Dashboard</Link>
+                    )}
                     <Link to="/orders" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">My Orders</Link>
                     <button className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500" onClick={handleLogout}>Logout</button>
                   </div>
@@ -585,6 +608,15 @@ export default function Navbar() {
                         >
                           Profile
                         </Link>
+                        {user.role === 'seller' && (
+                          <Link
+                            to="/seller-dashboard"
+                            className="block w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            Seller Dashboard
+                          </Link>
+                        )}
                         <button
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500"
                           onClick={() => {

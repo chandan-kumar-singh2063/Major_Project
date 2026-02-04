@@ -29,9 +29,11 @@ class UserRegistrationSerializer(ModelSerializer):
     email = EmailField(required=True)
     username = CharField(required=True, max_length=150)  # Override to remove default validators
 
+    role = CharField(write_only=True, required=False, default='buyer')
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'role']
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -39,6 +41,13 @@ class UserRegistrationSerializer(ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password']
         )
+        
+        # Save role to profile
+        role = validated_data.get('role', 'buyer')
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.role = role
+        profile.save()
+        
         return user
 
     def validate_username(self, value):
@@ -119,10 +128,11 @@ class UserRegistrationView(generics.CreateAPIView):
 class UserProfileSerializer(ModelSerializer):
     address = CharField(source='profile.address', allow_blank=True, required=False)
     phone_number = CharField(source='profile.phone_number', allow_blank=True, required=False)
+    role = CharField(source='profile.role', read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'address', 'phone_number']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'address', 'phone_number', 'role']
 
     def update(self, instance, validated_data):
         # Extract profile data nested by source='profile.address/phone_number'
@@ -294,6 +304,7 @@ class CustomGoogleLogin(SocialLoginView):
                         'username': user.username,
                         'first_name': user.first_name,
                         'last_name': user.last_name,
+                        'role': getattr(user.profile, 'role', 'buyer') if hasattr(user, 'profile') else 'buyer',
                     }
                 }, status=status.HTTP_200_OK)
                 

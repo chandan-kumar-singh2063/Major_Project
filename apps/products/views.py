@@ -16,6 +16,8 @@ from rest_framework.pagination import PageNumberPagination
 import json
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Sum, Count, Q, F
+from apps.orders.models import OrderItem
 
 #for returning product details with the help of sku
 from .models import Product
@@ -27,6 +29,7 @@ from .serializers import (
     ProductSerializer, ProductDetailSerializer, BrandSerializer, 
     ProductImageSerializer, ProductAttributeSerializer, ProductReviewSerializer
 )
+from .permissions import IsSeller, IsSellerOrReadOnly
 
 # ============================================================================
 # PAGINATION CLASS
@@ -47,8 +50,11 @@ class ProductListCreateView(generics.ListCreateAPIView):
     """List all products or create a new product with server-side pagination"""
     queryset = Product.objects.filter(is_active=True)
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsSellerOrReadOnly]
     pagination_class = ProductPagination
+    
+    def perform_create(self, serializer):
+        serializer.save(seller=self.request.user)
     
     def get_queryset(self):
         # Exclude products without ANY images (checked via main image field and related images)
@@ -86,6 +92,15 @@ class ProductListCreateView(generics.ListCreateAPIView):
             queryset = queryset.order_by(sort_by)
         
         return queryset.select_related('category', 'brand').prefetch_related('images')
+
+class SellerProductListView(generics.ListAPIView):
+    """View for sellers to see only their own products"""
+    serializer_class = ProductSerializer
+    permission_classes = [IsSeller]
+    pagination_class = ProductPagination
+
+    def get_queryset(self):
+        return Product.objects.filter(seller=self.request.user, is_active=True).select_related('category', 'brand').prefetch_related('images')
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a product"""
@@ -461,6 +476,31 @@ class ProductAnalyticsView(APIView):
         }
         
         return Response(analytics)
+
+class SellerStatsView(APIView):
+    """View to get overall stats for a seller"""
+    permission_classes = [IsSeller]
+
+    def get(self, request):
+        seller = request.user
+        
+        # Get products stats
+        products = Product.objects.filter(seller=seller, is_active=True)
+        total_products = products.count()
+        low_stock_products = products.filter(stock__lte=10).count()
+        
+        # Get sales stats
+        order_items = OrderItem.objects.filter(product__seller=seller)
+        
+        total_sales = order_items.count()
+        total_earnings = order_items.aggregate(total=Sum(F('quantity') * F('price')))['total'] or 0
+        
+        return Response({
+            'totalProducts': total_products,
+            'lowStock': low_stock_products,
+            'totalEarnings': float(total_earnings),
+            'totalSales': total_sales,
+        })
 
 # ============================================================================
 # BRAND VIEWS

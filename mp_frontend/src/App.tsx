@@ -26,6 +26,7 @@ import ResetPasswordConfirmPage from './pages/ResetPasswordConfirmPage';
 import OrdersPage from "./pages/OrdersPage";
 import WishlistPage from "./pages/WishlistPage";
 import SearchResults from "./components/SearchResults";
+import SellerDashboard from "./pages/SellerDashboard";
 
 import ProductDetailPage from "./components/ProductDetailPage";
 import PaymentSuccess from "./components/payment-success";
@@ -91,6 +92,7 @@ function App() {
             <Route path="/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
             <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
             <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+            <Route path="/seller-dashboard" element={<ProtectedRoute><SellerDashboard /></ProtectedRoute>} />
 
 
             {/* 404 */}

@@ -8,7 +8,7 @@ interface AuthModalProps {
 
 const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [mode, setMode] = useState<'login' | 'register' | 'profile'>('login');
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'buyer' });
   const [profile, setProfile] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -27,7 +27,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   if (!isOpen) return null;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     if (mode === 'profile') {
       setProfile({ ...profile, [e.target.name]: e.target.value });
     } else {
@@ -133,8 +133,14 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 placeholder="Last Name"
                 value={profile?.last_name || ''}
                 onChange={handleChange}
-                className="w-full mb-4 px-3 py-2 border rounded"
+                className="w-full mb-2 px-3 py-2 border rounded"
               />
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase px-1">Role</label>
+                <div className="px-3 py-2 border rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 capitalize">
+                  {profile?.role || 'buyer'}
+                </div>
+              </div>
               <button
                 type="submit"
                 className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-primary/90 transition"
@@ -179,9 +185,23 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 placeholder="Password"
                 value={form.password}
                 onChange={handleChange}
-                className="w-full mb-4 px-3 py-2 border rounded"
+                className="w-full mb-3 px-3 py-2 border rounded"
                 required
               />
+              {mode === 'register' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Join as:</label>
+                  <select
+                    name="role"
+                    value={form.role}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+                  >
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                  </select>
+                </div>
+              )}
               <button
                 type="submit"
                 className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-primary/90 transition"

@@ -33,6 +33,7 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source='category.name', read_only=True)
     brand_name = serializers.CharField(source='brand.name', read_only=True)
+    seller_name = serializers.CharField(source='seller.username', read_only=True)
     primary_image = serializers.SerializerMethodField()
     discount_amount = serializers.SerializerMethodField()
     is_on_sale = serializers.SerializerMethodField()
@@ -42,7 +43,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'description', 'short_description',
             'price', 'original_price', 'image', 'discount_percentage', 'discount_amount',
-            'category', 'category_name', 'brand', 'brand_name',
+            'category', 'category_name', 'brand', 'brand_name', 'seller', 'seller_name',
             'stock', 'stock_status', 'sku',
             'is_active', 'is_featured', 'is_trending', 'is_on_sale',
             'view_count', 'rating_average', 'rating_count',

@@ -47,6 +47,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
+                'role': getattr(user.profile, 'role', 'buyer') if hasattr(user, 'profile') else 'buyer',
             }
         }
         

@@ -13,6 +13,8 @@ urlpatterns = [
     path('search/', views.ProductSearchView.as_view(), name='product-search'),
     
     # Product CRUD
+    path('my-products/', views.SellerProductListView.as_view(), name='seller-product-list'),
+    path('stats/', views.SellerStatsView.as_view(), name='seller-stats'),
     path('', views.ProductListCreateView.as_view(), name='product-list-create'),
     path('<int:pk>/', views.ProductDetailView.as_view(), name='product-detail'),
     path('<slug:slug>/', views.ProductBySlugView.as_view(), name='product-by-slug'),

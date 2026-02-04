@@ -4,14 +4,14 @@ import { authAPI } from '@/api/services';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 const RegisterPage = () => {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({ username: '', email: '', password: '', role: 'buyer' });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -80,9 +80,23 @@ const RegisterPage = () => {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full mb-6 px-3 py-2 border rounded"
+            className="w-full mb-3 px-3 py-2 border rounded"
             required
           />
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              I want to join as a:
+            </label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+            >
+              <option value="buyer">Buyer (Customer)</option>
+              <option value="seller">Seller (Merchant)</option>
+            </select>
+          </div>
           <ReCAPTCHA
             sitekey="6LfHFYUrAAAAACVr6Xq3VHKv4VJlaYSJgQ9uWCQE"
             onChange={setRecaptchaToken}
