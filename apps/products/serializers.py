@@ -37,6 +37,8 @@ class ProductSerializer(serializers.ModelSerializer):
     primary_image = serializers.SerializerMethodField()
     discount_amount = serializers.SerializerMethodField()
     is_on_sale = serializers.SerializerMethodField()
+    sales_count = serializers.SerializerMethodField()
+    earnings = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -47,7 +49,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'stock', 'stock_status', 'sku',
             'is_active', 'is_featured', 'is_trending', 'is_on_sale',
             'view_count', 'rating_average', 'rating_count',
-            'primary_image', 'created_at', 'updated_at'
+            'primary_image', 'created_at', 'updated_at',
+            'sales_count', 'earnings'
         ]
         read_only_fields = [
             'slug', 'discount_percentage', 'discount_amount', 'is_on_sale',
@@ -75,6 +78,19 @@ class ProductSerializer(serializers.ModelSerializer):
             return obj.price < obj.original_price
         except:
             return False
+
+    def get_sales_count(self, obj):
+        from apps.orders.models import OrderItem
+        from django.db.models import Sum
+        return OrderItem.objects.filter(product=obj).aggregate(total=Sum('quantity'))['total'] or 0
+
+    def get_earnings(self, obj):
+        from apps.orders.models import OrderItem
+        from django.db.models import Sum, F
+        total = OrderItem.objects.filter(product=obj).aggregate(
+            total=Sum(F('quantity') * F('price'))
+        )['total'] or 0
+        return float(total)
 
 class ProductDetailSerializer(ProductSerializer):
     images = ProductImageSerializer(many=True, read_only=True)

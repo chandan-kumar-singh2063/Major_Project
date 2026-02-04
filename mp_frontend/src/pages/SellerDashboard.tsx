@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AddProductModal from '@/components/AddProductModal';
-import { Package, Plus, Trash2, Edit, ShoppingBag, TrendingUp, AlertCircle, DollarSign, BarChart2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Package, Plus, Trash2, Edit, ShoppingBag, AlertCircle, DollarSign, BarChart2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 interface Product {
@@ -15,10 +15,14 @@ interface Product {
     image?: string;
     seller: number;
     sku: string;
+    sales_count: number;
+    earnings: number;
+    is_active: boolean;
 }
 
 interface SellerStats {
     totalProducts: number;
+    liveProducts: number;
     lowStock: number;
     totalEarnings: number;
     totalSales: number;
@@ -30,6 +34,7 @@ const SellerDashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [stats, setStats] = useState<SellerStats>({
         totalProducts: 0,
+        liveProducts: 0,
         lowStock: 0,
         totalEarnings: 0,
         totalSales: 0,
@@ -106,7 +111,7 @@ const SellerDashboard = () => {
                     {[
                         { label: 'Total Sales', value: stats.totalSales, icon: ShoppingBag, color: 'blue' },
                         { label: 'Total Earnings', value: `₹${stats.totalEarnings.toLocaleString()}`, icon: DollarSign, color: 'green' },
-                        { label: 'Live Products', value: stats.totalProducts, icon: Package, color: 'purple' },
+                        { label: 'Live Products', value: stats.liveProducts, icon: Package, color: 'purple' },
                         { label: 'Low Stock', value: stats.lowStock, icon: AlertCircle, color: 'red' },
                     ].map((stat, i) => (
                         <motion.div
@@ -169,6 +174,8 @@ const SellerDashboard = () => {
                                     <tr>
                                         <th className="px-8 py-5">Product Details</th>
                                         <th className="px-8 py-5">Category</th>
+                                        <th className="px-8 py-5 text-center">Sales</th>
+                                        <th className="px-8 py-5 text-center">Revenue</th>
                                         <th className="px-8 py-5">Price</th>
                                         <th className="px-8 py-5">Inventory</th>
                                         <th className="px-8 py-5 text-center">Actions</th>
@@ -187,7 +194,12 @@ const SellerDashboard = () => {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <p className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">{product.name}</p>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-primary transition-colors">{product.name}</p>
+                                                            <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase ${product.is_active ? 'bg-green-100 text-green-600 dark:bg-green-900/30' : 'bg-red-100 text-red-600 dark:bg-red-900/30'}`}>
+                                                                {product.is_active ? 'Active' : 'Draft'}
+                                                            </span>
+                                                        </div>
                                                         <p className="text-xs font-mono text-gray-400 mt-1 uppercase tracking-tighter">SKU: {product.sku}</p>
                                                     </div>
                                                 </div>
@@ -196,6 +208,16 @@ const SellerDashboard = () => {
                                                 <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-lg text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                                     {product.category_name}
                                                 </span>
+                                            </td>
+                                            <td className="px-8 py-6 text-center">
+                                                <p className={`font-bold ${product.sales_count > 0 ? 'text-primary' : 'text-gray-400'}`}>
+                                                    {product.sales_count}
+                                                </p>
+                                            </td>
+                                            <td className="px-8 py-6 text-center">
+                                                <p className="font-bold dark:text-gray-200">
+                                                    ₹{product.earnings.toLocaleString()}
+                                                </p>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <p className="font-black text-gray-900 dark:text-gray-100">₹{parseFloat(product.price.toString()).toLocaleString()}</p>

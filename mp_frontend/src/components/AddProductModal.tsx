@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, Package, CheckCircle, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 interface Category {
@@ -30,6 +30,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
         category: '',
         stock: '',
         sku: '',
+        is_active: true,
     });
 
     useEffect(() => {
@@ -41,7 +42,13 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
     }, [isOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value, type } = e.target;
+        if (type === 'checkbox') {
+            const checked = (e.target as HTMLInputElement).checked;
+            setForm({ ...form, [name]: checked });
+        } else {
+            setForm({ ...form, [name]: value });
+        }
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,7 +67,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
         try {
             const formData = new FormData();
             Object.entries(form).forEach(([key, value]) => {
-                formData.append(key, value);
+                formData.append(key, String(value));
             });
 
             if (imageFile) {
@@ -86,6 +93,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
                 category: '',
                 stock: '',
                 sku: '',
+                is_active: true,
             });
             setImageFile(null);
             setImagePreview(null);
@@ -251,6 +259,23 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
                                     className="w-full px-4 py-2.5 rounded-xl border dark:border-gray-600 dark:bg-gray-700 dark:text-white outline-none focus:ring-2 focus:ring-primary transition-all"
                                     placeholder="Brief highlight..."
                                 />
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border dark:border-gray-600">
+                                <div>
+                                    <p className="text-sm font-bold dark:text-white">Make Product Active</p>
+                                    <p className="text-[10px] text-gray-500">Visible to all buyers immediately</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="is_active"
+                                        className="sr-only peer"
+                                        checked={form.is_active}
+                                        onChange={handleChange}
+                                    />
+                                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                                </label>
                             </div>
                         </div>
                     </div>

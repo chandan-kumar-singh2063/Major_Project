@@ -100,7 +100,7 @@ class SellerProductListView(generics.ListAPIView):
     pagination_class = ProductPagination
 
     def get_queryset(self):
-        return Product.objects.filter(seller=self.request.user, is_active=True).select_related('category', 'brand').prefetch_related('images')
+        return Product.objects.filter(seller=self.request.user).select_related('category', 'brand').prefetch_related('images')
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve, update or delete a product"""
@@ -485,18 +485,23 @@ class SellerStatsView(APIView):
         seller = request.user
         
         # Get products stats
-        products = Product.objects.filter(seller=seller, is_active=True)
+        products = Product.objects.filter(seller=seller)
         total_products = products.count()
+        live_products = products.filter(is_active=True).count()
         low_stock_products = products.filter(stock__lte=10).count()
         
         # Get sales stats
-        order_items = OrderItem.objects.filter(product__seller=seller)
+        # Only count earnings from non-cancelled orders
+        order_items = OrderItem.objects.filter(
+            product__seller=seller
+        ).exclude(order__status='cancelled').annotate(item_revenue=F('quantity') * F('price'))
         
-        total_sales = order_items.count()
-        total_earnings = order_items.aggregate(total=Sum(F('quantity') * F('price')))['total'] or 0
+        total_sales = OrderItem.objects.filter(product__seller=seller).exclude(order__status='cancelled').aggregate(total=Sum('quantity'))['total'] or 0
+        total_earnings = order_items.aggregate(total=Sum('item_revenue'))['total'] or 0
         
         return Response({
             'totalProducts': total_products,
+            'liveProducts': live_products,
             'lowStock': low_stock_products,
             'totalEarnings': float(total_earnings),
             'totalSales': total_sales,

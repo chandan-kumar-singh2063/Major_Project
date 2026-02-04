@@ -37,6 +37,13 @@ class OrderViewSet(viewsets.ModelViewSet):
             from apps.products.models import Product
             product = get_object_or_404(Product, id=buy_now_product_id)
             order = serializer.save(user=user, total_price=product.price, status='ordered')
+            # Update stock and purchase count
+            if product.stock >= 1:
+                product.stock -= 1
+                product.purchase_count += 1
+                product.save()
+                print(f"   📉 Stock reduced for {product.name} ({product.stock} left)")
+
             OrderItem.objects.create(
                 order=order,
                 product=product,
@@ -56,14 +63,26 @@ class OrderViewSet(viewsets.ModelViewSet):
 
             total = 0
             for item in cart.items.all():
+                product = item.product
+                quantity = item.quantity
+                
+                # Check and update stock
+                if product.stock >= quantity:
+                    product.stock -= quantity
+                    product.purchase_count += quantity
+                    product.save()
+                    print(f"   📉 Stock reduced for {product.name} ({product.stock} left)")
+                else:
+                    print(f"   ⚠️ Low stock for {product.name}: {product.stock}")
+
                 OrderItem.objects.create(
                     order=order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    price=item.product.price
+                    product=product,
+                    quantity=quantity,
+                    price=product.price
                 )
-                total += item.product.price * item.quantity
-                print(f"   ➕ Added {item.quantity}x {item.product.name}")
+                total += float(product.price) * quantity
+                print(f"   ➕ Added {quantity}x {product.name}")
             
             order.total_price = total
             order.save()
