@@ -7,7 +7,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.cart.models import Cart, CartItem
 from django.db import transaction
-import datetime
+from django.utils import timezone
+from decimal import Decimal
+from apps.products.models import Product
+from apps.cart.models import Cart, CartItem
 
 # Create your views here.
 
@@ -21,75 +24,76 @@ class OrderViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def perform_create(self, serializer):
         user = self.request.user
-        print(f"📦 [{datetime.datetime.now()}] Creating order for user: {user.username}")
-        print(f"📦 Request data: {self.request.data}")
+        data = self.request.data
+        transaction_id = data.get('transaction_id')
+        buy_now_product_id = data.get('buy_now_product_id')
+        buy_now_product_sku = data.get('buy_now_product_sku')
         
-        # Idempotency check
-        transaction_id = self.request.data.get('transaction_id')
-        if transaction_id and Order.objects.filter(user=user, transaction_id=transaction_id).exists():
-            print(f"⚠️ Order with transaction_id {transaction_id} already exists. Skipping.")
-            return 
+        print(f"DEBUG: 📦 Order placement started for {user.username}")
+        print(f"DEBUG: 📝 Request Data: {data}")
+        
+        # 1. Idempotency Check
+        if transaction_id:
+            existing = Order.objects.filter(user=user, transaction_id=transaction_id).first()
+            if existing:
+                print(f"DEBUG: ⚠️ Found existing order #{existing.id} for transaction {transaction_id}")
+                serializer.instance = existing
+                return
 
-        buy_now_product_id = self.request.data.get('buy_now_product_id')
-        
-        if buy_now_product_id:
-            print(f"🔥 Buy Now Flow for product index: {buy_now_product_id}")
-            from apps.products.models import Product
-            product = get_object_or_404(Product, id=buy_now_product_id)
+        # 2. Handle Buy Now Flow
+        if buy_now_product_id or buy_now_product_sku:
+            print(f"DEBUG: 🔥 Buy Now detected. ID: {buy_now_product_id}, SKU: {buy_now_product_sku}")
+            try:
+                if buy_now_product_sku:
+                    product = Product.objects.get(sku=buy_now_product_sku)
+                else:
+                    product = Product.objects.get(id=buy_now_product_id)
+            except Product.DoesNotExist:
+                identifier = buy_now_product_sku or buy_now_product_id
+                print(f"DEBUG: ❌ Product {identifier} not found in database!")
+                raise serializers.ValidationError({"error": f"Product {identifier} not found"})
+            
             order = serializer.save(user=user, total_price=product.price, status='ordered')
-            # Update stock and purchase count
+            
             if product.stock >= 1:
                 product.stock -= 1
                 product.purchase_count += 1
                 product.save()
-                print(f"   📉 Stock reduced for {product.name} ({product.stock} left)")
-
-            OrderItem.objects.create(
-                order=order,
-                product=product,
-                quantity=1,
-                price=product.price
-            )
-            print(f"✅ Buy Now order #{order.id} created successfully")
+            
+            OrderItem.objects.create(order=order, product=product, quantity=1, price=product.price)
+            print(f"DEBUG: ✅ Buy Now order #{order.id} complete")
+            
+        # 3. Handle Cart Flow
         else:
-            print(f"🛒 Cart Checkout Flow")
+            print("DEBUG: 🛒 Cart Checkout detected")
             cart = Cart.objects.filter(user=user).first()
             if not cart or not cart.items.exists():
-                print(f"❌ Cart is empty for user {user.username}")
-                raise serializers.ValidationError('Cart is empty.')
+                print(f"DEBUG: ❌ Cart empty for {user.username}")
+                raise serializers.ValidationError({"error": "Your cart is empty."})
             
-            # Initial save
             order = serializer.save(user=user, status='ordered')
-
-            total = 0
+            total = Decimal('0.00')
+            
             for item in cart.items.all():
-                product = item.product
-                quantity = item.quantity
+                prod = item.product
+                qty = item.quantity
                 
-                # Check and update stock
-                if product.stock >= quantity:
-                    product.stock -= quantity
-                    product.purchase_count += quantity
-                    product.save()
-                    print(f"   📉 Stock reduced for {product.name} ({product.stock} left)")
+                if prod.stock >= qty:
+                    prod.stock -= qty
                 else:
-                    print(f"   ⚠️ Low stock for {product.name}: {product.stock}")
+                    prod.stock = 0
+                
+                prod.purchase_count += qty
+                prod.save()
 
-                OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    quantity=quantity,
-                    price=product.price
-                )
-                total += float(product.price) * quantity
-                print(f"   ➕ Added {quantity}x {product.name}")
+                OrderItem.objects.create(order=order, product=prod, quantity=qty, price=prod.price)
+                total += Decimal(str(prod.price)) * Decimal(str(qty))
             
             order.total_price = total
             order.save()
             
-            # Clear cart
             cart.items.all().delete()
-            print(f"✅ Cart-to-Order #{order.id} created successfully for Rs. {total}. Cart cleared.")
+            print(f"DEBUG: ✅ Cart order #{order.id} complete. Total: {total}")
 
     @action(detail=False, methods=['get'], url_path='my')
     def my_orders(self, request):

@@ -50,17 +50,26 @@ export default function PaymentSuccess() {
 
             // Check if this was a "Buy Now" purchase
             let buyNowProductId = null;
+            let buyNowProductSku = null;
+
             if (details.purchaseOrderId && String(details.purchaseOrderId).startsWith('BUY_NOW_')) {
-                // Assuming the format is BUY_NOW_PID where PID is the product ID
                 const parts = String(details.purchaseOrderId).split('_');
-                buyNowProductId = parseInt(parts[parts.length - 1]);
+                // The format is BUY_NOW_{ID_OR_SKU}_{TIMESTAMP}
+                const identifier = parts[2]; // Index 2 is the ID or SKU
+
+                if (!isNaN(Number(identifier))) {
+                    buyNowProductId = parseInt(identifier);
+                } else {
+                    buyNowProductSku = identifier;
+                }
             }
 
             await ordersAPI.createOrder({
                 shipping_address: shippingAddress,
                 transaction_id: details.transactionId,
                 status: 'ordered',
-                ...(buyNowProductId && { buy_now_product_id: buyNowProductId })
+                ...(buyNowProductId && { buy_now_product_id: buyNowProductId }),
+                ...(buyNowProductSku && { buy_now_product_sku: buyNowProductSku })
             });
 
             console.log("Order created successfully!");

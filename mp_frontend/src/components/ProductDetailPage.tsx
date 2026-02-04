@@ -182,7 +182,7 @@ const ProductDetailPage = () => {
           name: product.name,
           email: "customer@example.com",
           shipping_address: profile?.address || "Remote (Paid via Khalti)",
-          purchase_order_id: `BUY_NOW_${product.id}_${Date.now()}`,
+          purchase_order_id: `BUY_NOW_${product.sku || product.id}_${Date.now()}`,
           purchase_order_name: product.name
         }),
 

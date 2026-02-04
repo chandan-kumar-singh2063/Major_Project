@@ -5,7 +5,6 @@ declare module '@/api/services' {
   export const userAPI: any;
   export const cartAPI: any;
   export const searchAPI: any;
-  export declare const ordersAPI: {
-    getMyOrders: () => Promise<any>;
-  };
+  export const wishlistAPI: any;
+  export const ordersAPI: any;
 } 
