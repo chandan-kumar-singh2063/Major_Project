@@ -498,13 +498,13 @@ export default function Navbar() {
                   <span className="font-semibold text-gray-700 dark:text-gray-200">{user.username}</span>
                 </button>
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 z-50 min-w-[120px]">
-                    <Link to="/profile" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">Profile</Link>
+                  <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg border dark:border-gray-700 rounded-xl py-2 z-50 min-w-[160px] overflow-hidden">
+                    <Link to="/profile" className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold transition-colors">Profile</Link>
                     {user.role === 'seller' && (
-                      <Link to="/seller-dashboard" className="block w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold">Seller Dashboard</Link>
+                      <Link to="/seller-dashboard" className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold border-y dark:border-gray-700 transition-colors">Seller Dashboard</Link>
                     )}
-                    <Link to="/orders" className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">My Orders</Link>
-                    <button className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500" onClick={handleLogout}>Logout</button>
+                    <Link to="/orders" className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold transition-colors">My Orders</Link>
+                    <button className="block w-full text-left px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 font-semibold border-t dark:border-gray-700 transition-colors" onClick={handleLogout}>Logout</button>
                   </div>
 
                 )}
@@ -600,10 +600,10 @@ export default function Navbar() {
                       <span className="font-semibold text-gray-700 dark:text-gray-200">{user.username}</span>
                     </button>
                     {showProfileMenu && (
-                      <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg rounded-lg py-2 z-50 min-w-[120px]">
+                      <div className="absolute right-0 mt-2 bg-white dark:bg-gray-900 shadow-lg border dark:border-gray-700 rounded-xl py-2 z-50 min-w-[160px] overflow-hidden">
                         <Link
                           to="/profile"
-                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold transition-colors"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           Profile
@@ -611,14 +611,21 @@ export default function Navbar() {
                         {user.role === 'seller' && (
                           <Link
                             to="/seller-dashboard"
-                            className="block w-full text-left px-4 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold"
+                            className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold border-y dark:border-gray-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                           >
                             Seller Dashboard
                           </Link>
                         )}
+                        <Link
+                          to="/orders"
+                          className="block w-full text-left px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 font-semibold transition-colors"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          My Orders
+                        </Link>
                         <button
-                          className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500"
+                          className="block w-full text-left px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 font-semibold border-t dark:border-gray-700 transition-colors"
                           onClick={() => {
                             handleLogout();
                             setIsMenuOpen(false);
