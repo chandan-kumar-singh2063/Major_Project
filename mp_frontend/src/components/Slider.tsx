@@ -14,7 +14,7 @@ const highlightProducts = [
   {
     type: 'image',
     name: 'Wireless Earbuds Pro',
-    image: '/banner_photos/earbuds.png',
+    image: '/banner_photos/earbuds.jpg',
     price: '$129',
     tagline: 'Freedom in every beat',
     theme: 'from-purple-800 to-indigo-900'

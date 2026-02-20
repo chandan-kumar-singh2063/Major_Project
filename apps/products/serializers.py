@@ -82,12 +82,16 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_sales_count(self, obj):
         from apps.orders.models import OrderItem
         from django.db.models import Sum
-        return OrderItem.objects.filter(product=obj).aggregate(total=Sum('quantity'))['total'] or 0
+        return OrderItem.objects.filter(
+            product=obj
+        ).exclude(order__status='cancelled').aggregate(total=Sum('quantity'))['total'] or 0
 
     def get_earnings(self, obj):
         from apps.orders.models import OrderItem
         from django.db.models import Sum, F
-        total = OrderItem.objects.filter(product=obj).aggregate(
+        total = OrderItem.objects.filter(
+            product=obj
+        ).exclude(order__status='cancelled').aggregate(
             total=Sum(F('quantity') * F('price'))
         )['total'] or 0
         return float(total)

@@ -10,7 +10,6 @@ from django.db import transaction
 from django.utils import timezone
 from decimal import Decimal
 from apps.products.models import Product
-from apps.cart.models import Cart, CartItem
 
 # Create your views here.
 
@@ -25,75 +24,108 @@ class OrderViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         data = self.request.data
+        
+        # Extract fields safely
         transaction_id = data.get('transaction_id')
-        buy_now_product_id = data.get('buy_now_product_id')
+        buy_now_product_id = data.get('buy_now_product_id') or data.get('product_id')
         buy_now_product_sku = data.get('buy_now_product_sku')
         
-        print(f"DEBUG: 📦 Order placement started for {user.username}")
-        print(f"DEBUG: 📝 Request Data: {data}")
+        # Reliable quantity extraction
+        quantity_raw = data.get('quantity')
+        try:
+            quantity = int(quantity_raw) if quantity_raw else 1
+            if quantity <= 0: quantity = 1
+        except (ValueError, TypeError):
+            quantity = 1
         
+        print(f"DEBUG: 📦 Order creation for {user.username} (Txn: {transaction_id})")
+
         # 1. Idempotency Check
-        if transaction_id:
+        if transaction_id and str(transaction_id).strip():
             existing = Order.objects.filter(user=user, transaction_id=transaction_id).first()
             if existing:
-                print(f"DEBUG: ⚠️ Found existing order #{existing.id} for transaction {transaction_id}")
+                print(f"DEBUG: ♻️ Reusing existing order #{existing.id}")
                 serializer.instance = existing
                 return
 
-        # 2. Handle Buy Now Flow
+        # 2. Handle "Buy Now" Flow (Single Product)
         if buy_now_product_id or buy_now_product_sku:
-            print(f"DEBUG: 🔥 Buy Now detected. ID: {buy_now_product_id}, SKU: {buy_now_product_sku}")
-            try:
-                if buy_now_product_sku:
-                    product = Product.objects.get(sku=buy_now_product_sku)
-                else:
+            product = None
+            if buy_now_product_sku:
+                product = Product.objects.filter(sku=buy_now_product_sku).first()
+            
+            if not product and buy_now_product_id:
+                try:
                     product = Product.objects.get(id=buy_now_product_id)
-            except Product.DoesNotExist:
-                identifier = buy_now_product_sku or buy_now_product_id
-                print(f"DEBUG: ❌ Product {identifier} not found in database!")
-                raise serializers.ValidationError({"error": f"Product {identifier} not found"})
+                except (Product.DoesNotExist, ValueError, TypeError):
+                    product = None
             
-            order = serializer.save(user=user, total_price=product.price, status='ordered')
+            if not product:
+                print(f"DEBUG: ❌ Product not found (ID: {buy_now_product_id}, SKU: {buy_now_product_sku})")
+                raise serializers.ValidationError({"error": "Product not found or unavailable."})
             
-            if product.stock >= 1:
-                product.stock -= 1
-                product.purchase_count += 1
-                product.save()
+            # Create Order
+            total_price = product.price * quantity
+            order = serializer.save(
+                user=user, 
+                total_price=total_price, 
+                status='ordered',
+                transaction_id=transaction_id
+            )
             
-            OrderItem.objects.create(order=order, product=product, quantity=1, price=product.price)
-            print(f"DEBUG: ✅ Buy Now order #{order.id} complete")
+            # Create Order Item
+            OrderItem.objects.create(
+                order=order, 
+                product=product, 
+                quantity=quantity, 
+                price=product.price
+            )
             
-        # 3. Handle Cart Flow
+            # Update Product Inventory/Stats
+            if product.stock >= quantity:
+                product.stock -= quantity
+            else:
+                product.stock = 0
+            product.purchase_count += quantity
+            product.save()
+            
+            print(f"DEBUG: ✅ Buy Now order #{order.id} saved for SKU {product.sku}")
+
+        # 3. Handle Cart Checkout Flow
         else:
-            print("DEBUG: 🛒 Cart Checkout detected")
             cart = Cart.objects.filter(user=user).first()
             if not cart or not cart.items.exists():
-                print(f"DEBUG: ❌ Cart empty for {user.username}")
                 raise serializers.ValidationError({"error": "Your cart is empty."})
             
-            order = serializer.save(user=user, status='ordered')
+            order = serializer.save(user=user, status='ordered', transaction_id=transaction_id)
             total = Decimal('0.00')
             
             for item in cart.items.all():
                 prod = item.product
                 qty = item.quantity
                 
+                # Update Product Inventory/Stats
                 if prod.stock >= qty:
                     prod.stock -= qty
                 else:
                     prod.stock = 0
-                
                 prod.purchase_count += qty
                 prod.save()
 
-                OrderItem.objects.create(order=order, product=prod, quantity=qty, price=prod.price)
+                OrderItem.objects.create(
+                    order=order, 
+                    product=prod, 
+                    quantity=qty, 
+                    price=prod.price
+                )
                 total += Decimal(str(prod.price)) * Decimal(str(qty))
             
             order.total_price = total
             order.save()
             
+            # Clear the cart
             cart.items.all().delete()
-            print(f"DEBUG: ✅ Cart order #{order.id} complete. Total: {total}")
+            print(f"DEBUG: ✅ Cart order #{order.id} saved. Total: {total}")
 
     @action(detail=False, methods=['get'], url_path='my')
     def my_orders(self, request):
@@ -139,6 +171,14 @@ class OrderViewSet(viewsets.ModelViewSet):
             "status": "success",
             "message": "Order cancelled successfully and products have been restocked."
         })
+
+    @action(detail=False, methods=['get'])
+    def seller_orders(self, request):
+        """Returns orders for products owned by the current seller"""
+        from .serializers import OrderItemSerializer
+        order_items = OrderItem.objects.filter(product__seller=request.user).order_by('-order__created_at')
+        serializer = OrderItemSerializer(order_items, many=True)
+        return Response(serializer.data)
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
