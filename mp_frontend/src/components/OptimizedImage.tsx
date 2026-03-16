@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, memo } from 'react';
 
-// In-memory cache for optimized image blob URLs
-const imageCache = new Map<string, string>();
+import { imageCache } from '../utils/imageUtils';
 
 interface OptimizedImageProps {
   src: string;
@@ -64,22 +63,29 @@ const OptimizedImage = memo(({
     const isWebp = src.toLowerCase().endsWith('.webp');
 
     if (isSvg || isAvif) {
-      // SVG and AVIF don't need canvas optimization
       setOptimizedSrc(src);
       setIsLoading(false);
       return;
     }
 
-    // For non-local images (API/database URLs), just lazy-load without resizing
+    // For non-local images, just load directly but still allow the loading state to animate
     if (!isLocalAsset) {
       setOptimizedSrc(src);
       setIsLoading(false);
       return;
     }
 
+    // Ensure spaces and special characters in local filenames are handled
+    const encodedSrc = src.split('/').map(segment => encodeURIComponent(segment)).join('/').replace(/%2F/g, '/');
+    const finalSrc = encodedSrc.startsWith('%2F') ? encodedSrc.replace('%2F', '/') : encodedSrc;
+
     // Optimize the image using canvas
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    
+    // Only use anonymous CORS for external images to avoid issues with some local setups
+    if (!isLocalAsset) {
+      img.crossOrigin = 'anonymous';
+    }
 
     img.onload = () => {
       try {
@@ -87,7 +93,6 @@ const OptimizedImage = memo(({
         const ctx = canvas.getContext('2d');
 
         if (!ctx) {
-          // Canvas not supported, use original
           setOptimizedSrc(src);
           setIsLoading(false);
           return;
@@ -95,10 +100,8 @@ const OptimizedImage = memo(({
 
         let { width, height } = img;
 
-        // Only resize if the image is larger than max dimensions
         if (width > maxWidth || height > maxHeight) {
           const aspectRatio = width / height;
-
           if (width > height) {
             width = maxWidth;
             height = Math.round(maxWidth / aspectRatio);
@@ -110,19 +113,13 @@ const OptimizedImage = memo(({
 
         canvas.width = width;
         canvas.height = height;
-
-        // Use better image smoothing
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert to compressed format
-        // Use WebP if supported, otherwise JPEG
         const outputFormat = isWebp ? 'image/webp' : 'image/jpeg';
         const dataUrl = canvas.toDataURL(outputFormat, quality);
 
-        // Cache the optimized image
         imageCache.set(cacheKey, dataUrl);
         setOptimizedSrc(dataUrl);
       } catch (err) {
@@ -136,11 +133,11 @@ const OptimizedImage = memo(({
     img.onerror = () => {
       console.warn('Failed to load image for optimization:', src);
       setOptimizedSrc(src);
-      setIsLoading(false);
       setHasError(true);
+      setIsLoading(false);
     };
 
-    img.src = src;
+    img.src = finalSrc;
 
     return () => {
       img.onload = null;
@@ -154,18 +151,21 @@ const OptimizedImage = memo(({
         className={`bg-gray-200 dark:bg-gray-700 flex items-center justify-center ${className}`}
         style={style}
       >
-        <span className="text-gray-400 text-xs">Image not available</span>
+        <span className="text-gray-400 text-xs text-center px-4">Image not available</span>
       </div>
     );
   }
 
   return (
-    <div className={`relative overflow-hidden ${onClick ? 'cursor-pointer' : ''}`} onClick={onClick}>
+    <div 
+      className={`relative overflow-hidden ${className} ${onClick ? 'cursor-pointer' : ''}`} 
+      style={style}
+      onClick={onClick}
+    >
       {/* Loading placeholder */}
       {isLoading && showPlaceholder && (
         <div
-          className={`absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse rounded ${className}`}
-          style={style}
+          className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse"
         />
       )}
 
@@ -175,8 +175,11 @@ const OptimizedImage = memo(({
           ref={imgRef}
           src={optimizedSrc}
           alt={alt}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-          style={style}
+          className={`w-full h-full ${className.includes('object-') ? '' : 'object-cover'} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          style={{ 
+            display: 'block',
+            ...(className.includes('absolute') ? { position: 'absolute', top: 0, left: 0 } : {})
+          }}
           loading="lazy"
           decoding="async"
           onLoad={() => setIsLoading(false)}
@@ -184,8 +187,10 @@ const OptimizedImage = memo(({
             // If optimized version fails, fall back to original
             if (optimizedSrc !== src) {
               setOptimizedSrc(src);
+            } else {
+              setHasError(true);
+              setIsLoading(false);
             }
-            setHasError(true);
           }}
         />
       )}
@@ -196,60 +201,3 @@ const OptimizedImage = memo(({
 OptimizedImage.displayName = 'OptimizedImage';
 
 export default OptimizedImage;
-
-/**
- * Preload and optimize images ahead of time.
- * Call this for critical above-the-fold images.
- */
-export function preloadOptimizedImage(
-  src: string,
-  maxWidth = 600,
-  maxHeight = 600,
-  quality = 0.7
-): void {
-  const cacheKey = `${src}_${maxWidth}_${maxHeight}_${quality}`;
-
-  if (imageCache.has(cacheKey)) return;
-
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => {
-    try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      let { width, height } = img;
-      if (width > maxWidth || height > maxHeight) {
-        const aspectRatio = width / height;
-        if (width > height) {
-          width = maxWidth;
-          height = Math.round(maxWidth / aspectRatio);
-        } else {
-          height = maxHeight;
-          width = Math.round(maxHeight * aspectRatio);
-        }
-      }
-
-      canvas.width = width;
-      canvas.height = height;
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, width, height);
-
-      const dataUrl = canvas.toDataURL('image/jpeg', quality);
-      imageCache.set(cacheKey, dataUrl);
-    } catch (err) {
-      console.warn('Preload optimization failed:', src, err);
-    }
-  };
-  img.src = src;
-}
-
-/**
- * Clear the image optimization cache.
- * Useful for freeing memory if needed.
- */
-export function clearImageCache(): void {
-  imageCache.clear();
-}

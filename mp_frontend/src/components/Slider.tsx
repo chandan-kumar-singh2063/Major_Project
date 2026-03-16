@@ -42,10 +42,10 @@ const highlightProducts = [
   },
   {
     type: 'image',
-    name: 'Camera',
+    name: 'Professional Camera',
     image: '/banner_photos/camera.jpg',
-    price: '$199',
-    tagline: 'Camera that moves with you',
+    price: '$899',
+    tagline: 'Capture every detail with precision',
     theme: 'from-[#92400e] via-[#b45309] to-[#d97706]',
     accentColor: 'rgba(245, 158, 11, 0.5)'
   }

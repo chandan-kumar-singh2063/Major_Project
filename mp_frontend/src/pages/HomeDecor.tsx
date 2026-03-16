@@ -6,11 +6,11 @@ import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsLis
 import OptimizedImage from '@/components/OptimizedImage';
 
 const homeDecorCategories = [
-  { name: 'Modern Minimalist', image: '/assets/modern minimalist.png' },
-  { name: 'Rustic Farmhouse', image: '/assets/roustic farmhouse.png' },
-  { name: 'Bohemian Chic', image: '/assets/bohemian chic.png' },
-  { name: 'Scandinavian', image: '/assets/scanidinavian.png' },
-  { name: 'Industrial Loft', image: '/assets/industrial loft.jpg' },
+  { name: 'Modern Minimalist', image: '/assets/modern minimalist.png', path: 'modern-minimalist' },
+  { name: 'Rustic Farmhouse', image: '/assets/roustic farmhouse.png', path: 'rustic-farmhouse' },
+  { name: 'Bohemian Chic', image: '/assets/bohemian chic.png', path: 'bohemian-chic' },
+  { name: 'Scandinavian', image: '/assets/scanidinavian.png', path: 'scandinavian' },
+  { name: 'Industrial Loft', image: '/assets/industrial loft.jpg', path: 'industrial-loft' },
 ];
 
 const featuredDecorProducts = [
@@ -69,7 +69,7 @@ export default function HomeDecor() {
         {homeDecorCategories.map((cat, idx) => (
           <motion.a
             key={cat.name}
-            href={`/category/home-decor/${cat.name.toLowerCase().replace(/ /g, '-')}`}
+            href={`/category/home-decor/${cat.path}`}
             whileHover={{ y: -15, scale: 1.07, rotate: idx % 2 === 0 ? -2 : 2 }}
             className="relative w-72 h-64 rounded-3xl overflow-hidden shadow-2xl cursor-pointer group bg-white dark:bg-gray-800"
             style={{ zIndex: 10 - idx, marginTop: idx % 2 ? 24 : 0 }}
