@@ -9,6 +9,7 @@ import AuthModal from './AuthModal';
 import CartModal from './CartModal';
 import FeedbackModal from './FeedBackModal';
 import SearchSuggestions from './SearchSuggestions';
+import OptimizedImage from './OptimizedImage';
 import { authAPI } from '@/api/services';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
@@ -770,10 +771,13 @@ export default function Navbar() {
               <div className="relative aspect-[4/3] bg-black">
                 {imageCaptured && capturedImageUrl ? (
                   <>
-                    <img
+                    <OptimizedImage
                       src={capturedImageUrl}
                       alt="Captured product"
                       className="w-full h-full object-contain"
+                      maxWidth={800}
+                      maxHeight={600}
+                      quality={0.8}
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                       <CheckCircle className="text-green-400" size={48} />

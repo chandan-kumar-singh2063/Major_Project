@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import OptimizedImage from "@/components/OptimizedImage";
 
 export default function Donate() {
   const [amount, setAmount] = useState("");
@@ -68,10 +69,13 @@ export default function Donate() {
             <div className="flex flex-wrap justify-center gap-6">
               {Object.entries(qrCodes).map(([label, src]) => (
                 <div key={label} className="text-center">
-                  <img
+                  <OptimizedImage
                     src={src}
                     alt={`${label} QR`}
                     className="w-36 h-36 rounded-lg object-contain shadow-md border border-gray-200 dark:border-zinc-700"
+                    maxWidth={150}
+                    maxHeight={150}
+                    quality={0.8}
                   />
                   <p className="mt-2 text-sm">{label}</p>
                 </div>

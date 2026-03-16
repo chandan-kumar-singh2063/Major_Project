@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { categoriesAPI } from '@/api/services';
+import OptimizedImage from './OptimizedImage';
 
 interface Category {
   id: number;
@@ -30,7 +31,7 @@ const CategoriesList = ({ onSelect }: CategoriesListProps) => {
             onClick={() => onSelect && onSelect(cat.id)}
           >
             {cat.image && (
-              <img src={cat.image} alt={cat.name} className="w-16 h-16 object-cover rounded-full mb-2" />
+              <OptimizedImage src={cat.image} alt={cat.name} className="w-16 h-16 object-cover rounded-full mb-2" maxWidth={80} maxHeight={80} quality={0.7} />
             )}
             <span className="font-semibold text-center text-gray-800 dark:text-gray-100">{cat.name}</span>
           </div>

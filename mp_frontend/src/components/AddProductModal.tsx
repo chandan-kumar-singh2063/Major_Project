@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Upload, Package, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import OptimizedImage from './OptimizedImage';
 
 interface Category {
     id: number;
@@ -231,7 +232,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
                                 <div className="relative group overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary transition-all">
                                     {imagePreview ? (
                                         <div className="h-48 w-full relative">
-                                            <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                                            <OptimizedImage src={imagePreview} alt="Preview" className="h-full w-full object-cover" maxWidth={400} maxHeight={400} quality={0.8} />
                                             <button
                                                 type="button"
                                                 onClick={() => { setImageFile(null); setImagePreview(null); }}
