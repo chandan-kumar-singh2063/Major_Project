@@ -15,6 +15,7 @@ import {
   Camera,
 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import OptimizedImage from "./OptimizedImage";
 
 export default function SearchResults() {
   const location = useLocation();
@@ -201,7 +202,7 @@ export default function SearchResults() {
                           onClick={() => handleProductClick(product.id)}
                         >
                           <div className="relative h-60 overflow-hidden">
-                            <img
+                            <OptimizedImage
                               src={
                                 product.image ||
                                 product.image_path ||
@@ -209,6 +210,9 @@ export default function SearchResults() {
                               }
                               alt={product.name}
                               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              maxWidth={500}
+                              maxHeight={400}
+                              quality={0.7}
                             />
 
                             {/* ✅ FIXED: Always show similarity on image search */}

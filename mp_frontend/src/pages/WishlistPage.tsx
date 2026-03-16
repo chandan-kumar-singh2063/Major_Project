@@ -4,6 +4,7 @@ import { wishlistAPI, cartAPI } from '@/api/services';
 import { Heart, ShoppingCart, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import OptimizedImage from '../components/OptimizedImage';
 
 interface WishlistItem {
     id: number;
@@ -124,10 +125,13 @@ const WishlistPage = () => {
                                     className="relative aspect-square overflow-hidden cursor-pointer"
                                     onClick={() => navigate(`/product/${item.product}`)}
                                 >
-                                    <img
+                                    <OptimizedImage
                                         src={item.product_details.image}
                                         alt={item.product_details.name}
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        maxWidth={400}
+                                        maxHeight={400}
+                                        quality={0.7}
                                     />
                                     <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
                                 </div>

@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { Sparkles, Home, Percent, Search } from 'lucide-react';
 import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsList';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const homeDecorCategories = [
   { name: 'Modern Minimalist', image: '/assets/modern minimalist.png' },
@@ -73,11 +74,13 @@ export default function HomeDecor() {
             className="relative w-72 h-64 rounded-3xl overflow-hidden shadow-2xl cursor-pointer group bg-white dark:bg-gray-800"
             style={{ zIndex: 10 - idx, marginTop: idx % 2 ? 24 : 0 }}
           >
-            <img
+            <OptimizedImage
               src={cat.image}
               alt={cat.name}
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              loading="lazy"
+              maxWidth={400}
+              maxHeight={300}
+              quality={0.65}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
             <h3 className="absolute bottom-6 left-6 text-white text-xl font-bold drop-shadow-lg">
@@ -106,11 +109,13 @@ export default function HomeDecor() {
               whileHover={{ scale: 1.05 }}
               className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden transition"
             >
-              <img
+              <OptimizedImage
                 src={image}
                 alt={name}
                 className="w-full h-56 object-cover"
-                loading="lazy"
+                maxWidth={400}
+                maxHeight={280}
+                quality={0.65}
               />
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h3>
@@ -150,11 +155,13 @@ export default function HomeDecor() {
               whileHover={{ scale: 1.06 }}
               className="relative bg-white dark:bg-gray-800 rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden transition"
             >
-              <img
+              <OptimizedImage
                 src={image}
                 alt={name}
                 className="w-full h-56 object-cover"
-                loading="lazy"
+                maxWidth={400}
+                maxHeight={280}
+                quality={0.65}
               />
               <div className="p-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h3>

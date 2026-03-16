@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { Sparkles, ShoppingBag, Percent } from 'lucide-react';
 import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsList';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const fashionCollections = [
   { name: 'Summer Dresses', image: '/assets/summerdress.jpg' },
@@ -48,10 +49,13 @@ export default function FashionContent() {
               whileHover={{ rotate: -3, scale: 1.05 }}
               className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group"
             >
-              <img
+              <OptimizedImage
                 src={collection.image}
                 alt={collection.name}
                 className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-500"
+                maxWidth={500}
+                maxHeight={300}
+                quality={0.65}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
               <h3 className="absolute bottom-4 left-4 text-lg font-bold text-white z-10 drop-shadow-md">
@@ -76,10 +80,13 @@ export default function FashionContent() {
             whileHover={{ scale: 1.03 }}
             className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
           >
-            <img
+            <OptimizedImage
               src="/assets/men fashion.jpg"
               alt="Men's Fashion"
               className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+              maxWidth={700}
+              maxHeight={450}
+              quality={0.65}
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -92,10 +99,13 @@ export default function FashionContent() {
             whileHover={{ scale: 1.03 }}
             className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
           >
-            <img
+            <OptimizedImage
               src="/assets/women fashion.jpg"
               alt="Women's Fashion"
               className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+              maxWidth={700}
+              maxHeight={450}
+              quality={0.65}
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
               <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -123,7 +133,7 @@ export default function FashionContent() {
               whileHover={{ rotate: 2, scale: 1.05 }}
               className="bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl transition overflow-hidden"
             >
-              <img src={item.image} alt={item.name} className="w-full h-52 object-cover" />
+              <OptimizedImage src={item.image} alt={item.name} className="w-full h-52 object-cover" maxWidth={400} maxHeight={280} quality={0.65} />
               <div className="p-5">
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg">{item.name}</h4>
                 <p className="text-pink-600 font-bold text-base mt-1">{item.price}</p>
@@ -160,7 +170,7 @@ export default function FashionContent() {
               whileHover={{ rotate: -2, scale: 1.05 }}
               className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-xl hover:shadow-2xl transition overflow-hidden"
             >
-              <img src={deal.image} alt={deal.name} className="w-full h-52 object-cover" />
+              <OptimizedImage src={deal.image} alt={deal.name} className="w-full h-52 object-cover" maxWidth={400} maxHeight={280} quality={0.65} />
               <div className="p-5">
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-lg">{deal.name}</h4>
                 <div className="flex items-center gap-3 text-sm mt-1">

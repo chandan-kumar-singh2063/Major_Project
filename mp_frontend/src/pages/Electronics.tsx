@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { Sparkles, Cpu } from 'lucide-react';
 import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsList';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const electronicsSubcategories = [
   { name: 'Laptops', image: '/assets/computer.png' },
@@ -35,10 +36,13 @@ export default function ElectronicsContent() {
               whileHover={{ scale: 1.1 }}
               className="relative min-w-[200px] h-48 rounded-2xl overflow-hidden shadow-lg cursor-pointer group flex-shrink-0"
             >
-              <img
+              <OptimizedImage
                 src={sub.image}
                 alt={sub.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                maxWidth={400}
+                maxHeight={250}
+                quality={0.65}
               />
               <div className="absolute inset-0 bg-black/  group-hover:bg-black/60 transition" />
               <h3 className="absolute bottom-4 left-4 text-lg font-semibold text-white z-10 drop-shadow-md">

@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { Sparkles, Smartphone, Zap } from 'lucide-react';
 import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsList';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const gadgetCategories = [
   { name: 'Smartphones', image: '/assets/smartphone.png' },
@@ -75,10 +76,13 @@ export default function Gadgets() {
               whileHover={{ scale: 1.05, boxShadow: '0 8px 20px rgba(99, 102, 241, 0.4)' }}
               className="relative group rounded-xl overflow-hidden shadow-md bg-white dark:bg-gray-900 cursor-pointer border border-transparent hover:border-indigo-500 transition"
             >
-              <img
+              <OptimizedImage
                 src={category.image}
                 alt={category.name}
                 className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                maxWidth={400}
+                maxHeight={250}
+                quality={0.65}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-70 transition-opacity" />
               <h3 className="absolute bottom-4 left-4 text-xl font-semibold text-white drop-shadow-md z-10">
@@ -118,10 +122,13 @@ export default function Gadgets() {
               whileHover={{ scale: 1.04, y: -5 }}
               className="bg-white dark:bg-gray-900 rounded-2xl shadow-md hover:shadow-xl transition p-4 flex flex-col cursor-pointer"
             >
-              <img
+              <OptimizedImage
                 src={item.image}
                 alt={item.name}
                 className="w-full h-48 object-contain rounded-lg mb-4"
+                maxWidth={400}
+                maxHeight={250}
+                quality={0.65}
               />
               <h3 className="font-semibold text-gray-900 dark:text-gray-200 text-lg mb-2">{item.name}</h3>
               <p className="text-indigo-600 font-bold text-xl">{item.price}</p>
@@ -159,10 +166,13 @@ export default function Gadgets() {
               whileHover={{ scale: 1.05, y: -4 }}
               className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-md hover:shadow-xl transition p-4 cursor-pointer overflow-hidden"
             >
-              <img
+              <OptimizedImage
                 src={deal.image}
                 alt={deal.name}
                 className="w-full h-48 object-contain rounded-lg mb-4"
+                maxWidth={400}
+                maxHeight={250}
+                quality={0.65}
               />
               <h3 className="font-semibold text-gray-900 dark:text-gray-200 text-lg">{deal.name}</h3>
               <div className="flex items-center gap-3 mt-2">

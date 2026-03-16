@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
+import OptimizedImage from './OptimizedImage';
 
 const highlightProducts = [
   {
@@ -161,14 +162,21 @@ export default function Slider() {
               />
 
               {highlightProducts[current].type === 'image' ? (
-                <motion.img
-                  src={highlightProducts[current].image}
-                  alt={highlightProducts[current].name}
-                  className="relative z-10 object-contain max-h-[22rem] md:max-h-[28rem] w-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                <motion.div
                   initial={{ y: 20, opacity: 0, scale: 0.9 }}
                   animate={{ y: 0, opacity: 1, scale: 1 }}
                   transition={{ duration: 0.7, delay: 0.2, type: 'spring' }}
-                />
+                  className="relative z-10"
+                >
+                  <OptimizedImage
+                    src={highlightProducts[current].image}
+                    alt={highlightProducts[current].name}
+                    className="object-contain max-h-[22rem] md:max-h-[28rem] w-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                    maxWidth={1200}
+                    maxHeight={800}
+                    quality={0.8}
+                  />
+                </motion.div>
               ) : (
                 <motion.video
                   src={highlightProducts[current].image}

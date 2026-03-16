@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Heart, Share2, Star, Minus, Plus, Truck, Shield, RotateCcw, MessageCircle, CheckCircle } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import OptimizedImage from './OptimizedImage';
 import { productsAPI, wishlistAPI, authAPI } from '@/api/services';
 import { useCart } from '@/contexts/CartContext';
 
@@ -393,7 +394,7 @@ const ProductDetailPage = () => {
                           }`}
                         onClick={() => setSelectedImage(index)}
                       >
-                        <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+                        <OptimizedImage src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" maxWidth={150} maxHeight={150} quality={0.6} />
                       </div>
                     ))}
                   </div>
@@ -401,10 +402,13 @@ const ProductDetailPage = () => {
                   {/* Main Image */}
                   <div className="flex-1">
                     <div className="aspect-square rounded-xl overflow-hidden bg-white dark:bg-gray-800 group">
-                      <img
+                      <OptimizedImage
                         src={productImages[selectedImage]}
                         alt={productName}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        maxWidth={1000}
+                        maxHeight={1000}
+                        quality={0.8}
                       />
                     </div>
                   </div>

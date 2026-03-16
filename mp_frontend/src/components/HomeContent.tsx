@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Search, Sparkles, TrendingUp, Camera, Percent } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { categoriesAPI } from '@/api/services';
+import OptimizedImage from './OptimizedImage';
 
 // Removed hardcoded featuredCategories
 
@@ -75,10 +76,13 @@ export default function HomeContent() {
               className="group relative rounded-xl overflow-hidden shadow-lg"
             >
               {cat.image && (
-                <img
+                <OptimizedImage
                   src={cat.image}
                   alt={cat.name}
                   className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
+                  maxWidth={400}
+                  maxHeight={300}
+                  quality={0.7}
                 />
               )}
               <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition" />
@@ -117,10 +121,13 @@ export default function HomeContent() {
               whileHover={{ scale: 1.05 }}
               className="bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
-              <img
+              <OptimizedImage
                 src={prod.image}
                 alt={prod.name}
                 className="w-full h-50 object-cover"
+                maxWidth={400}
+                maxHeight={300}
+                quality={0.65}
               />
               <div className="p-3">
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">{prod.name}</h4>
@@ -158,7 +165,7 @@ export default function HomeContent() {
               whileHover={{ scale: 1.05 }}
               className="relative bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
-              <img src={item.image} alt={item.name} className="w-full h-48 object-cover" />
+              <OptimizedImage src={item.image} alt={item.name} className="w-full h-48 object-cover" maxWidth={400} maxHeight={250} quality={0.65} />
               <div className="p-4">
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">{item.name}</h4>
                 <div className="flex items-center gap-2 text-sm">

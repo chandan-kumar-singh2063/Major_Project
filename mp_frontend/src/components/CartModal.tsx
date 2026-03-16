@@ -8,6 +8,7 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
+import OptimizedImage from "./OptimizedImage";
 
 interface CartModalProps {
   isOpen: boolean;
@@ -135,10 +136,13 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
                   className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                 >
                   <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 dark:border-gray-600">
-                    <img
+                    <OptimizedImage
                       src={item.product_image || "/placeholder.png"}
                       alt={item.product_name}
                       className="w-full h-full object-cover"
+                      maxWidth={100}
+                      maxHeight={100}
+                      quality={0.6}
                     />
                   </div>
                   <div className="flex-1 min-w-0">

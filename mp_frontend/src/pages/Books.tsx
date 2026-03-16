@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import { motion } from 'framer-motion';
 import { Sparkles, BookOpen} from 'lucide-react';
 import HybridPaginatedProductsList from '@/components/HybridPaginatedProductsList';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const bookCategories = [
   { name: 'Fantasy', image: '/assets/fantasy book.jpg' },
@@ -34,10 +35,13 @@ export default function BooksContent() {
               whileHover={{ rotate: -3, scale: 1.05 }}
               className="relative rounded-2xl overflow-hidden shadow-lg cursor-pointer group"
             >
-              <img
+              <OptimizedImage
                 src={category.image}
                 alt={category.name}
                 className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-500"
+                maxWidth={400}
+                maxHeight={300}
+                quality={0.65}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
               <h3 className="absolute bottom-4 left-4 text-lg font-bold text-white z-10 drop-shadow-md">
@@ -63,10 +67,13 @@ export default function BooksContent() {
       whileHover={{ scale: 1.03 }}
       className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group col-span-1 md:col-span-2"
     >
-      <img
+      <OptimizedImage
         src="/assets/biography.avif"
         alt="Biography"
         className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+        maxWidth={700}
+        maxHeight={450}
+        quality={0.65}
       />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
         <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -79,10 +86,13 @@ export default function BooksContent() {
       whileHover={{ scale: 1.03 }}
       className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
     >
-      <img
+      <OptimizedImage
         src="/assets/self help.webp"
         alt="Self-Help"
         className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+        maxWidth={500}
+        maxHeight={450}
+        quality={0.65}
       />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
         <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -98,10 +108,13 @@ export default function BooksContent() {
       whileHover={{ scale: 1.03 }}
       className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
     >
-      <img
+      <OptimizedImage
         src="/assets/history book.jpg"
         alt="History"
         className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+        maxWidth={500}
+        maxHeight={450}
+        quality={0.65}
       />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
         <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -114,10 +127,13 @@ export default function BooksContent() {
       whileHover={{ scale: 1.03 }}
       className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
     >
-      <img
+      <OptimizedImage
         src="/assets/philosophy book.jpg"
         alt="Philosophy"
         className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+        maxWidth={500}
+        maxHeight={450}
+        quality={0.65}
       />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
         <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
@@ -130,10 +146,13 @@ export default function BooksContent() {
       whileHover={{ scale: 1.03 }}
       className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
     >
-      <img
+      <OptimizedImage
         src="/assets/children books.webp"
         alt="Children's Books"
         className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+        maxWidth={500}
+        maxHeight={450}
+        quality={0.65}
       />
       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
         <h2 className="text-white text-4xl md:text-5xl font-extrabold drop-shadow-lg">
