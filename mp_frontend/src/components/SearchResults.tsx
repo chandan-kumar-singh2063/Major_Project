@@ -250,7 +250,7 @@ export default function SearchResults() {
                                       );
                                     }
                                   }}
-                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium hover:scale-105 transition-all transform translate-y-2 group-hover:translate-y-0 bg-pink-500 hover:bg-pink-600 text-white dark:bg-pink-600 dark:hover:bg-pink-700"
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium hover:scale-105 transition-all transform translate-y-2 group-hover:translate-y-0 bg-pink-500 hover:bg-pink-600 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200"
                                 >
                                   <ShoppingCart size={16} />
                                   Add to Cart
@@ -261,7 +261,7 @@ export default function SearchResults() {
                                     e.stopPropagation(); // Prevent card click when button is clicked
                                     handleProductClick(product.id);
                                   }}
-                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium hover:scale-105 transition-all transform translate-y-2 group-hover:translate-y-0 bg-pink-500 hover:bg-pink-600 text-white dark:bg-pink-600 dark:hover:bg-pink-700"
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full text-sm font-medium hover:scale-105 transition-all transform translate-y-2 group-hover:translate-y-0 bg-pink-500 hover:bg-pink-600 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200"
                                 >
                                   <Zap size={16} />
                                   Buy Now

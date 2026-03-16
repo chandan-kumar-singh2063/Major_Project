@@ -57,7 +57,7 @@ const ProductsList = ({ categoryId }: ProductsListProps) => {
             <span className="font-semibold text-center text-gray-800 dark:text-gray-100 mb-1">{prod.name}</span>
             <span className="text-primary font-bold">₹{prod.price}</span>
             <button
-              className="mt-2 px-3 py-1 bg-primary text-white rounded hover:bg-primary/80"
+              className="mt-2 px-3 py-1 bg-primary text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 rounded hover:bg-primary/80 transition-colors"
               onClick={(e) => handleAddToCart(prod.id, e)}
             >
               Add to Cart
