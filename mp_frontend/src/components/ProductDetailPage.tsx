@@ -457,7 +457,7 @@ const ProductDetailPage = () => {
                         key={color}
                         onClick={() => setSelectedColor(color)}
                         className={`py-3 px-4 rounded-lg border-2 font-medium transition-all ${selectedColor === color
-                          ? 'border-primary bg-primary text-white'
+                          ? 'border-primary bg-primary text-white dark:bg-white dark:text-black dark:border-white'
                           : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                           }`}
                       >
@@ -480,7 +480,7 @@ const ProductDetailPage = () => {
                           key={size}
                           onClick={() => setSelectedSize(size)}
                           className={`py-3 px-4 rounded-lg border-2 font-medium transition-all ${selectedSize === size
-                            ? 'border-primary bg-primary text-white'
+                            ? 'border-primary bg-primary text-white dark:bg-white dark:text-black dark:border-white'
                             : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                             }`}
                         >
