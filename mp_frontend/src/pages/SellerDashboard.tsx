@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AddProductModal from '@/components/AddProductModal';
+import OptimizedImage from '@/components/OptimizedImage';
 import { Package, Plus, Trash2, Edit, ShoppingBag, AlertCircle, DollarSign, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -188,7 +189,7 @@ const SellerDashboard = () => {
                                                 <div className="flex items-center gap-5">
                                                     <div className="h-16 w-16 rounded-2xl bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0 border-2 border-transparent group-hover:border-primary/20 transition-all">
                                                         {product.image ? (
-                                                            <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                                                            <OptimizedImage src={product.image} alt={product.name} className="h-full w-full object-cover" maxWidth={100} maxHeight={100} quality={0.6} />
                                                         ) : (
                                                             <div className="h-full w-full flex items-center justify-center text-gray-300"><Package size={24} /></div>
                                                         )}

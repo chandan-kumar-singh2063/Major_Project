@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersAPI } from '@/api/services';
 import { Package, Clock, CheckCircle, XCircle, ChevronRight, MapPin, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const statusColors: { [key: string]: string } = {
     ordered: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
@@ -178,10 +179,13 @@ const OrdersPage = () => {
                                             {order.items.map((item) => (
                                                 <div key={item.id} className="flex gap-4">
                                                     <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
-                                                        <img
+                                                        <OptimizedImage
                                                             src={item.product?.image || 'https://via.placeholder.com/64'}
                                                             alt={item.product?.name}
                                                             className="w-full h-full object-cover"
+                                                            maxWidth={100}
+                                                            maxHeight={100}
+                                                            quality={0.6}
                                                         />
                                                     </div>
                                                     <div className="flex-1">

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FaLaptopCode, FaMobileAlt, FaBrain, FaTools, FaFacebook, FaLinkedin, FaInstagram, FaGithub } from 'react-icons/fa';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const AboutUs = () => {
   return (
@@ -60,7 +61,14 @@ const AboutUs = () => {
                 <a href="https://portfolio-sonu.com" className="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300 text-sm" target="_blank" rel="noopener noreferrer">Portfolio</a>
               </div>
             </div>
-            <img src="/image_sonu.jpeg" alt="Sonu Kumar Gupta" className="w-66 h-66 rounded-2xl object-cover" />
+            <OptimizedImage
+              src="/image_sonu.jpeg"
+              alt="Sonu Kumar Gupta"
+              className="w-66 h-66 rounded-2xl object-cover"
+              maxWidth={400}
+              maxHeight={400}
+              quality={0.7}
+            />
           </div>
         </motion.div>
 
@@ -96,7 +104,14 @@ const AboutUs = () => {
                 <a href="https://portfolio-chandan.com" className="bg-gray-200 text-gray-800 px-3 py-1 rounded hover:bg-gray-300 text-sm" target="_blank" rel="noopener noreferrer">Portfolio</a>
               </div>
             </div>
-            <img src="/image_chandan.png" alt="Chandan Kumar Singh" className="w-66 h-66 rounded-2xl object-cover transform translate-y-4" />
+            <OptimizedImage
+              src="/image_chandan.png"
+              alt="Chandan Kumar Singh"
+              className="w-66 h-66 rounded-2xl object-cover transform translate-y-4"
+              maxWidth={400}
+              maxHeight={400}
+              quality={0.7}
+            />
           </div>
         </motion.div>
       </div>
