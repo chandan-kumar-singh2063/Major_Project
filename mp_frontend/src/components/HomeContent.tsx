@@ -79,7 +79,7 @@ export default function HomeContent() {
                 <OptimizedImage
                   src={cat.image}
                   alt={cat.name}
-                  className="w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
                   maxWidth={400}
                   maxHeight={300}
                   quality={0.7}
@@ -124,10 +124,10 @@ export default function HomeContent() {
               <OptimizedImage
                 src={prod.image}
                 alt={prod.name}
-                className="w-full h-50 object-cover"
+                className="w-full aspect-square object-contain bg-gray-50 dark:bg-gray-800"
                 maxWidth={400}
-                maxHeight={300}
-                quality={0.65}
+                maxHeight={400}
+                quality={0.75}
               />
               <div className="p-3">
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">{prod.name}</h4>
@@ -165,7 +165,7 @@ export default function HomeContent() {
               whileHover={{ scale: 1.05 }}
               className="relative bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
-              <OptimizedImage src={item.image} alt={item.name} className="w-full h-48 object-cover" maxWidth={400} maxHeight={250} quality={0.65} />
+              <OptimizedImage src={item.image} alt={item.name} className="w-full aspect-square object-cover" maxWidth={400} maxHeight={400} quality={0.75} />
               <div className="p-4">
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">{item.name}</h4>
                 <div className="flex items-center gap-2 text-sm">
