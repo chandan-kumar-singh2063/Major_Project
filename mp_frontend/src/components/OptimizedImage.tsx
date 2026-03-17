@@ -175,7 +175,7 @@ const OptimizedImage = memo(({
           ref={imgRef}
           src={optimizedSrc}
           alt={alt}
-          className={`w-full h-full ${className.includes('object-') ? '' : 'object-cover'} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+          className={`w-full h-full ${className.split(' ').filter(c => c.startsWith('object-')).join(' ') || 'object-cover'} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
           style={{ 
             display: 'block',
             ...(className.includes('absolute') ? { position: 'absolute', top: 0, left: 0 } : {})
