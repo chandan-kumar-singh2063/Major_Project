@@ -211,7 +211,7 @@ export default function HomeDecor() {
         className="mt-24 px-4 max-w-7xl mx-auto"
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Home Decor in this Category</h2>
-        <HybridPaginatedProductsList categoryId={6} />
+        <HybridPaginatedProductsList categoryId={10} />
       </motion.section>
     </div>
     <Footer/>

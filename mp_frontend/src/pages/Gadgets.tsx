@@ -220,7 +220,7 @@ export default function Gadgets() {
         className="mt-24 px-4 max-w-7xl mx-auto"
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Gadgets in this Category</h2>
-        <HybridPaginatedProductsList categoryId={5} />
+        <HybridPaginatedProductsList categoryId={9} />
       </motion.section>
     </div>
     <Footer/>

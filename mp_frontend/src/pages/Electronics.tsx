@@ -62,7 +62,7 @@ export default function ElectronicsContent() {
         className="mt-24 px-4 max-w-7xl mx-auto"
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Electronics in this Category</h2>
-        <HybridPaginatedProductsList categoryId={3} itemsPerPage={12} />
+        <HybridPaginatedProductsList categoryId={11} itemsPerPage={12} />
       </motion.section>
 
       {/* AI Suggestions */}
