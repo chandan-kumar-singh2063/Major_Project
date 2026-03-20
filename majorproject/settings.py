@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,16 +24,23 @@ env_path = BASE_DIR / '.env.local'
 
 load_dotenv(env_path)
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-$)#&%ak4lf8-w&u96t=66j)v-4u83lafj71=9+bmi7*@(fhd8k'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-$)#&%ak4lf8-w&u96t=66j)v-4u83lafj71=9+bmi7*@(fhd8k')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 
 # Application definition
@@ -69,12 +77,7 @@ INSTALLED_APPS = [
 ]
 SITE_ID = 2
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://192.168.10.91:5173",
-    "http://192.168.10.67:5173",
-]
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(',')
 
 
 
@@ -97,6 +100,7 @@ CORS_ALLOW_HEADERS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # MUST BE FIRST
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -132,16 +136,15 @@ WSGI_APPLICATION = 'majorproject.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'MajorProject',
-        'USER':'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'mysql://root:@127.0.0.1:3306/MajorProject'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
+# Ensure MySQL engine for dj-database-url if not explicitly provided
+if DATABASES['default']['ENGINE'] == 'django.db.backends.mysql':
+    DATABASES['default']['OPTIONS'] = {'charset': 'utf8mb4'}
 
 
 # Password validation
@@ -178,24 +181,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Additional locations of static files
 STATICFILES_DIRS = [
@@ -241,16 +233,7 @@ DEFAULT_FROM_EMAIL = "e-pasal <yadavnigam72@gmail.com>"
 
 
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://192.168.10.91:5173",
-    "http://192.168.10.129:5173",
-    
-    "http://192.168.10.129:8000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:8000').split(',')
 
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read the cookie
 CSRF_COOKIE_SAMESITE = 'Lax'

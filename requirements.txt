@@ -29,3 +29,6 @@ sql==2022.4.0
 sqlparse==0.5.3
 tablib==3.8.0
 urllib3==2.5.0
+gunicorn==23.0.0
+whitenoise==6.9.0
+dj-database-url==2.3.0
