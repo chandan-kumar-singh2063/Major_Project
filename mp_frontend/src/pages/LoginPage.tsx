@@ -1,14 +1,11 @@
 // LoginPage.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { authAPI } from "@/api/services";
 import { GoogleLogin } from "@react-oauth/google";
 import { useCart } from "@/contexts/CartContext";
 import IntroSplash from "@/components/IntroSplash";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Configure axios globally
-axios.defaults.withCredentials = true;
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -27,13 +24,10 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const res = await axios.post(
-        "http://localhost:8000/api/auth/login/",
-        {
-          email: email,
-          password: password
-        }
-      );
+      const res = await authAPI.login({
+        email: email,
+        password: password
+      });
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
@@ -66,10 +60,7 @@ const LoginPage = () => {
         access_token: response.credential,
       };
 
-      const res = await axios.post(
-        "http://localhost:8000/auth/google/",
-        payload
-      );
+      const res = await authAPI.googleLogin(payload);
 
       localStorage.setItem("access", res.data.access);
       localStorage.setItem("refresh", res.data.refresh);
