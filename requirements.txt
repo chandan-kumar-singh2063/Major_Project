@@ -32,7 +32,6 @@ protobuf==6.33.5
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
 pycparser==2.22
-pygraphviz==1.14
 PyJWT==2.9.0
 pyparsing==3.3.2
 python-dotenv==1.1.1
