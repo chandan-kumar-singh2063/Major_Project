@@ -69,10 +69,8 @@ export const authAPI = {
     api.post(`/auth/reset/${uid}/${token}/`, { new_password }),
   // Google OAuth login (uses different base URL since it's not under /api/)
   googleLogin: (data) => {
-    const baseURL = import.meta.env.VITE_API_URL 
-      ? import.meta.env.VITE_API_URL.replace('/api', '') 
-      : 'https://majorproject-deployment-2hsxl.ondigitalocean.app';
-    return axios.post(`${baseURL}/auth/google/`, data, {
+    // Explicitly using the full absolute URL for production to avoid routing to media/static buckets
+    return axios.post(`https://majorproject-deployment-2hsxl.ondigitalocean.app/auth/google/`, data, {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
     });
