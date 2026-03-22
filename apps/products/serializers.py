@@ -39,12 +39,14 @@ class ProductSerializer(serializers.ModelSerializer):
     is_on_sale = serializers.SerializerMethodField()
     sales_count = serializers.SerializerMethodField()
     earnings = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'slug', 'description', 'short_description',
-            'price', 'original_price', 'image', 'discount_percentage', 'discount_amount',
+            'price', 'original_price', 'image_url', 'discount_percentage', 'discount_amount',
             'category', 'category_name', 'brand', 'brand_name', 'seller', 'seller_name',
             'stock', 'stock_status', 'sku',
             'is_active', 'is_featured', 'is_trending', 'is_on_sale',
@@ -57,6 +59,17 @@ class ProductSerializer(serializers.ModelSerializer):
             'view_count', 'rating_average', 'rating_count', 'stock_status',
             'created_at', 'updated_at'
         ]
+
+    def get_image_url(self, obj):
+        if obj.image:
+            if isinstance(obj.image, str):
+                return obj.image
+            try:
+                # In case it's still a file object locally
+                return obj.image.url
+            except:
+                return None
+        return None
 
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()
