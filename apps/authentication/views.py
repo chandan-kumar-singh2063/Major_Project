@@ -206,7 +206,7 @@ class PasswordResetAPIView(APIView):
             return Response({'success': 'If an account exists for this email, a reset link has been sent.'})
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        reset_link = f"http://localhost:5173/reset-password/{uid}/{token}/"
+        reset_link = f"https://majorproject-deployment-2hsxl.ondigitalocean.app/reset-password/{uid}/{token}/"
         subject = "Password Reset Request"
         message = f"Hi {user.username},\n\nPlease click the link below to reset your password:\n{reset_link}\n\nIf you did not request this, you can ignore this email."
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
@@ -239,7 +239,7 @@ class CustomGoogleLogin(SocialLoginView):
     permission_classes = [AllowAny]
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = 'http://localhost:5173'
+    callback_url = 'https://majorproject-deployment-2hsxl.ondigitalocean.app'
 
     def post(self, request, *args, **kwargs):
         # DEBUG: Print what we received

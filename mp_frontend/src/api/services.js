@@ -71,7 +71,7 @@ export const authAPI = {
   googleLogin: (data) => {
     const baseURL = import.meta.env.VITE_API_URL 
       ? import.meta.env.VITE_API_URL.replace('/api', '') 
-      : 'http://localhost:8000';
+      : 'https://majorproject-deployment-2hsxl.ondigitalocean.app';
     return axios.post(`${baseURL}/auth/google/`, data, {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
