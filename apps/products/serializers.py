@@ -75,7 +75,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def get_is_on_sale(self, obj):
         try:
-            return obj.price < obj.original_price
+            if obj.original_price and obj.price:
+                return obj.price < obj.original_price
+            return False
         except:
             return False
 
