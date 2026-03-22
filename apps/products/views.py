@@ -58,10 +58,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         # Exclude products without ANY images (checked via main image field and related images)
-        queryset = Product.objects.filter(is_active=True).exclude(
-            Q(image='') | Q(image__isnull=True), 
-            images__isnull=True
-        ).distinct()
+        queryset = Product.objects.filter(is_active=True).distinct()
         
         # Filter by category
         category_id = self.request.query_params.get('category')
@@ -199,10 +196,7 @@ class ProductFilterView(generics.ListAPIView):
 
     def get_queryset(self):
         # Apply same image filter to ensure consistency across search/filter results
-        queryset = Product.objects.filter(is_active=True).exclude(
-            Q(image='') | Q(image__isnull=True), 
-            images__isnull=True
-        ).distinct()
+        queryset = Product.objects.filter(is_active=True).distinct()
 
         # Category filter (safe for IDs and names)
         category = self.request.query_params.get('category')

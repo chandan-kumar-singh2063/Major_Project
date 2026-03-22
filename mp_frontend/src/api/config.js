@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://majorproject-deployment-2hsxl.ondigitalocean.app/api';
 
 import axios from 'axios';
 

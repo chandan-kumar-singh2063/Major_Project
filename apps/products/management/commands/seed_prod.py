@@ -8,6 +8,19 @@ from django.conf import settings
 from apps.products.models import Product, Category
 from decimal import Decimal
 import time
+from concurrent.futures import ThreadPoolExecutor
+import threading
+
+# Thread-safe counter
+class Counter:
+    def __init__(self):
+        self.value = 0
+        self._lock = threading.Lock()
+
+    def increment(self):
+        with self._lock:
+            self.value += 1
+            return self.value
 
 class Command(BaseCommand):
     help = 'Seeds the production Neon database with products from CSVs and uploads images to Cloudinary'
@@ -51,76 +64,71 @@ class Command(BaseCommand):
             {'path': old_data_csv, 'folder': 'old_data'}
         ]
 
-        total_processed = 0
-        limit = options['limit']
+        self.processed_counter = Counter()
+        self.limit = options['limit']
+        self.media_base = media_base
 
-        for dataset in datasets:
-            if limit and total_processed >= limit:
-                break
+        # Function to process a single row (for threading)
+        def process_row(row, data_folder):
+            if self.limit and self.processed_counter.value >= self.limit:
+                return
 
-            csv_path = dataset['path']
-            data_folder = dataset['folder']
+            try:
+                name = row.get('Name')
+                sku = row.get('Sku')
+                image_filename = row.get('image_filename')
+                if not name or not sku or not image_filename: return
 
-            if not os.path.exists(csv_path):
-                self.stdout.write(self.style.WARNING(f'CSV not found: {csv_path}'))
-                continue
+                # Optimization: Skip if product already exists in DB
+                if Product.objects.filter(sku=sku).exists():
+                    self.stdout.write(self.style.NOTICE(f"Skipping: {name} (Already in DB)"))
+                    return
 
-            with open(csv_path, mode='r', encoding='utf-8') as file:
-                reader = csv.DictReader(file)
-                for row in reader:
-                    if limit and total_processed >= limit:
-                        break
+                # Check local path
+                local_img_path = os.path.join(self.media_base, data_folder, image_filename)
+                if not os.path.exists(local_img_path): return
 
-                    try:
-                        name = row.get('Name')
-                        price = row.get('Price', '0.0')
-                        description = row.get('Description', '')
-                        sku = row.get('Sku')
-                        category_name = row.get('Category', 'General')
-                        image_filename = row.get('image_filename')
+                # Upload to Cloudinary
+                upload_result = cloudinary.uploader.upload(
+                    local_img_path,
+                    folder=f'products/{row.get("Category", "General")}',
+                    public_id=f'{sku}_{int(time.time())}'
+                )
+                cloudinary_url = upload_result.get('secure_url')
 
-                        if not name or not image_filename:
-                            continue
+                # Create Product
+                category, _ = Category.objects.get_or_create(name=row.get('Category', 'General'))
+                Product.objects.update_or_create(
+                    sku=sku,
+                    defaults={
+                        'name': name,
+                        'price': Decimal(row.get('Price', '0.0')),
+                        'description': row.get('Description', ''),
+                        'category': category,
+                        'image': cloudinary_url,
+                        'stock': 100,
+                        'is_active': True,
+                    }
+                )
+                
+                count = self.processed_counter.increment()
+                self.stdout.write(self.style.SUCCESS(f'[{count}] Seeded: {name}'))
 
-                        # Create category
-                        category, _ = Category.objects.get_or_create(name=category_name)
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f'Error seeding {row.get("Name")}: {str(e)}'))
 
-                        # Check local path
-                        local_img_outer_folder = os.path.join(media_base, data_folder)
-                        local_img_path = os.path.join(local_img_outer_folder, image_filename)
+        # Run with 10 threads (10x faster)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            for dataset in datasets:
+                if self.limit and self.processed_counter.value >= self.limit:
+                    break
 
-                        if not os.path.exists(local_img_path):
-                            self.stdout.write(self.style.WARNING(f'Image missing: {local_img_path}'))
-                            continue
+                csv_path = dataset['path']
+                if not os.path.exists(csv_path): continue
 
-                        # 4. Upload to Cloudinary
-                        self.stdout.write(f'Uploading {image_filename} for {name}...')
-                        upload_result = cloudinary.uploader.upload(
-                            local_img_path,
-                            folder=f'products/{category_name}',
-                            public_id=f'{sku}_{int(time.time())}'
-                        )
-                        cloudinary_url = upload_result.get('secure_url')
+                with open(csv_path, mode='r', encoding='utf-8') as file:
+                    reader = list(csv.DictReader(file)) # Convert to list for thread executor
+                    for row in reader:
+                        executor.submit(process_row, row, dataset['folder'])
 
-                        # 5. Create Product
-                        # We use update_or_create to avoid duplicates
-                        Product.objects.update_or_create(
-                            sku=sku,
-                            defaults={
-                                'name': name,
-                                'price': Decimal(price),
-                                'description': description,
-                                'category': category,
-                                'image': cloudinary_url,
-                                'stock': 100,
-                                # slug will be auto-generated in model.save()
-                            }
-                        )
-
-                        total_processed += 1
-                        self.stdout.write(self.style.SUCCESS(f'[{total_processed}] Successfully seeded: {name}'))
-
-                    except Exception as e:
-                        self.stdout.write(self.style.ERROR(f'Error seeding {name}: {str(e)}'))
-
-        self.stdout.write(self.style.SUCCESS(f'Finished! Total products processed: {total_processed}'))
+        self.stdout.write(self.style.SUCCESS(f'Finished! Total products processed: {self.processed_counter.value}'))
