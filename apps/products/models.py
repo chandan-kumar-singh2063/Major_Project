@@ -93,7 +93,13 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            slug = base_slug
+            # If slug already exists for a different product, append SKU to avoid collision
+            qs = Product.objects.filter(slug=slug).exclude(pk=self.pk)
+            if qs.exists() and self.sku:
+                slug = f"{base_slug}-{slugify(self.sku)}"
+            self.slug = slug
         
         # Calculate discount percentage
         orig = to_float(self.original_price)
