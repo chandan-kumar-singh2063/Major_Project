@@ -40,11 +40,11 @@ class Product(models.Model):
         ('limited_stock', 'Limited Stock'),
     ]
 
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     description = models.TextField()
-    short_description = models.CharField(max_length=300, blank=True)
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    short_description = models.CharField(max_length=500, blank=True, null=True)
+    image = models.CharField(max_length=500, blank=True, null=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', null=True, blank=True)
     
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -124,10 +124,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(
-        upload_to='products/',
-        validators=[validate_image_file_extension, validate_image_file_size]
-    )
+    image = models.CharField(max_length=500)
     alt_text = models.CharField(max_length=200, blank=True)
     is_primary = models.BooleanField()
     
