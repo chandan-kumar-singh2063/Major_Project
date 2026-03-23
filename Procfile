@@ -1,1 +1,1 @@
-web: gunicorn majorproject.wsgi --log-file -
+web: uvicorn simple_api:app --host 0.0.0.0 --port $PORT

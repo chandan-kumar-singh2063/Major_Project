@@ -17,6 +17,7 @@ django-import-export==4.3.8
 django-recaptcha==4.1.0
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
+fastapi==0.104.1
 google-api-core==2.29.0
 google-api-python-client==2.188.0
 google-auth==2.48.0
@@ -39,6 +40,7 @@ pycparser==2.22
 PyJWT==2.9.0
 pyparsing==3.3.2
 python-dotenv==1.1.1
+python-multipart==0.0.6
 requests==2.32.4
 requests-oauthlib==2.0.0
 rsa==4.9.1
@@ -48,4 +50,5 @@ sqlparse==0.5.3
 tablib==3.8.0
 uritemplate==4.2.0
 urllib3==2.5.0
+uvicorn[standard]==0.24.0
 whitenoise==6.12.0
