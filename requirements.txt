@@ -48,6 +48,7 @@ six==1.17.0
 sql==2022.4.0
 sqlparse==0.5.3
 tablib==3.8.0
+uvicorn[standard]==0.24.0
 uritemplate==4.2.0
 urllib3==2.5.0
 uvicorn[standard]==0.24.0

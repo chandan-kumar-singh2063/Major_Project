@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Image Search API using Hugging Face Inference API
+E-Commerce Image Search API
+Calls Hugging Face Inference API for ViT model predictions
 """
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
@@ -11,7 +12,7 @@ from typing import Optional
 
 app = FastAPI(
     title="E-Commerce Image Search API",
-    description="Image search using Hugging Face ViT model",
+    description="Image search using Hugging Face ViT model inference",
     version="1.0"
 )
 
@@ -24,10 +25,11 @@ app.add_middleware(
 )
 
 # Configuration
-HF_TOKEN = os.getenv("HF_TOKEN")  # Will be set in DO environment
+HF_TOKEN = os.getenv("HF_TOKEN", "")
 HF_MODEL = "nigamyadav72/vit-ecommerce-classifier"
-HF_URL = f"https://router.huggingface.co/hf-inference/models/{HF_MODEL}"
-HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
+HF_INFERENCE_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
+
+headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
 
 @app.get("/")
 async def root():
@@ -42,7 +44,8 @@ async def root():
 async def health_check():
     return {
         "status": "healthy",
-        "model": HF_MODEL
+        "model": HF_MODEL,
+        "has_token": bool(HF_TOKEN)
     }
 
 @app.post("/search-image/")
@@ -52,7 +55,7 @@ async def search_image(
     threshold: float = Query(0.3, ge=0.0, le=1.0, description="Minimum similarity")
 ):
     """
-    Search for similar products using image via Hugging Face API
+    Search for similar products using image via Hugging Face Inference API
     """
     try:
         # Read image
@@ -60,13 +63,19 @@ async def search_image(
         if len(image_data) == 0:
             raise HTTPException(status_code=400, detail="Empty image file")
 
-        # Call Hugging Face API
+        # Call Hugging Face Inference API
         response = requests.post(
-            HF_URL,
-            headers=HEADERS,
+            HF_INFERENCE_URL,
+            headers=headers,
             files={"file": image_data},
             timeout=60
         )
+
+        if response.status_code == 401:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid HF_TOKEN. Please set HF_TOKEN environment variable with a valid token from https://huggingface.co/settings/tokens"
+            )
 
         if response.status_code != 200:
             raise HTTPException(
@@ -74,24 +83,26 @@ async def search_image(
                 detail=f"Model inference failed: {response.text}"
             )
 
-        # Parse HF response
+        # Parse HF response - it returns a list of classification results
         hf_result = response.json()
 
-        # For now, return mock results since we don't have the actual product database
-        # In production, you'd map the HF predictions to your product catalog
-        mock_results = [
-            {
-                "sku": f"MOCK-{i+1:03d}",
-                "similarity": 0.85 - (i * 0.05),  # Decreasing similarity
-                "confidence": "high" if i < 3 else "medium"
-            }
-            for i in range(min(top_k, 10))
-        ]
+        # Extract top predictions from HF response
+        # HF returns something like: [{"score": 0.95, "label": "category_name"}, ...]
+        results = []
+        if isinstance(hf_result, list):
+            for i, item in enumerate(hf_result[:top_k]):
+                if item.get("score", 0) >= threshold:
+                    results.append({
+                        "sku": f"SKU-{item.get('label', 'unknown').upper()}-{i+1:03d}",
+                        "label": item.get("label", "unknown"),
+                        "similarity": item.get("score", 0),
+                        "confidence": "high" if item.get("score", 0) > 0.8 else "medium" if item.get("score", 0) > 0.5 else "low"
+                    })
 
         return {
-            "results": mock_results,
-            "total": len(mock_results),
-            "hf_prediction": hf_result,  # Include raw HF result for debugging
+            "results": results,
+            "total": len(results),
+            "model": HF_MODEL,
             "parameters": {
                 "top_k": top_k,
                 "threshold": threshold
@@ -105,4 +116,4 @@ async def search_image(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

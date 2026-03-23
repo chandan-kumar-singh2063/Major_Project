@@ -160,7 +160,8 @@ def payment_success(request):
     
     print(f"✅ Payment Success Callback - PIDX: {pidx}, Status: {status_param}, TxnID: {transaction_id}")
     
-    is_success = str(status_param).lower() in ['completed', 'success', 'n/a']  # default n/a to success for legacy
+    # Be lenient: only mark as failure if status is explicitly failed or canceled
+    is_success = str(status_param).lower() not in ['failed', 'canceled', 'cancelled', 'user_canceled']
     
     title = "Payment Successful!" if is_success else "Payment Cancelled/Failed"
     message = "Your payment has been processed successfully." if is_success else "Your payment process did not complete."
