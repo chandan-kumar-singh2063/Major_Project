@@ -168,14 +168,14 @@ def payment_success(request):
     color1 = "#667eea" if is_success else "#ff6a00"
     color2 = "#764ba2" if is_success else "#ee0979"
 
-    html_content = f"""
+    html_content = """
     <!DOCTYPE html>
     <html>
     <head>
         <title>{title}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {{
+            body {
                 font-family: Arial, sans-serif;
                 display: flex;
                 justify-content: center;
@@ -184,29 +184,29 @@ def payment_success(request):
                 margin: 0;
                 background: linear-gradient(135deg, {color1} 0%, {color2} 100%);
                 color: white;
-            }}
-            .container {{
+            }
+            .container {
                 text-align: center;
                 padding: 2rem;
-            }}
-            .checkmark {{
+            }
+            .checkmark {
                 font-size: 4rem;
                 margin-bottom: 1rem;
                 animation: scaleIn 0.5s ease-out;
-            }}
-            @keyframes scaleIn {{
-                from {{ transform: scale(0); }}
-                to {{ transform: scale(1); }}
-            }}
-            h1 {{
+            }
+            @keyframes scaleIn {
+                from { transform: scale(0); }
+                to { transform: scale(1); }
+            }
+            h1 {
                 font-size: 2rem;
                 margin-bottom: 0.5rem;
-            }}
-            p {{
+            }
+            p {
                 font-size: 1rem;
                 opacity: 0.9;
-            }}
-            .close-button {{
+            }
+            .close-button {
                 margin-top: 2rem;
                 padding: 1rem 2rem;
                 font-size: 1rem;
@@ -217,16 +217,16 @@ def payment_success(request):
                 border-radius: 8px;
                 cursor: pointer;
                 transition: all 0.3s;
-            }}
-            .close-button:hover {{
+            }
+            .close-button:hover {
                 background: rgba(255, 255, 255, 0.3);
                 transform: scale(1.05);
-            }}
-            .countdown {{
+            }
+            .countdown {
                 font-size: 0.875rem;
                 margin-top: 1rem;
                 opacity: 0.8;
-            }}
+            }
         </style>
     </head>
     <body>
@@ -238,35 +238,44 @@ def payment_success(request):
             <p class="countdown" id="auto-close-msg"></p>
         </div>
         <script>
-            function closeWindow() {{
+            function closeWindow() {
                 // Try to close the window/WebView
-                if (window.close) {{
+                if (window.close) {
                     window.close();
-                }}
+                }
                 // Also try history.back as fallback
-                setTimeout(() => {{
-                    if (window.history.length > 1) {{
+                setTimeout(() => {
+                    if (window.history.length > 1) {
                         window.history.back();
-                    }}
-                }}, 100);
-            }}
+                    }
+                }, 100);
+            }
             
             // Auto-close after 3 seconds
             let count = 3;
             const msgEl = document.getElementById('auto-close-msg');
             
-            const countdown = setInterval(() => {{
-                msgEl.textContent = `Auto-closing in ${{count}} seconds...`;
+            const countdown = setInterval(() => {
+                msgEl.textContent = `Auto-closing in ${count} seconds...`;
                 count--;
                 
-                if (count < 0) {{
+                if (count < 0) {
                     clearInterval(countdown);
                     closeWindow();
-                }}
-            }}, 1000);
+                }
+            }, 1000);
         </script>
     </body>
     </html>
     """
+    
+    # Manually replace to avoid curly brace issues
+    html_content = (
+        html_content.replace("{title}", title)
+                    .replace("{message}", message)
+                    .replace("{icon}", icon)
+                    .replace("{color1}", color1)
+                    .replace("{color2}", color2)
+    )
     
     return HttpResponse(html_content, content_type='text/html') 
