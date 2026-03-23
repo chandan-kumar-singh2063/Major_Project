@@ -13,16 +13,23 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'product', 'product_name', 'product_price', 'product_image', 'quantity']
 
     def get_product_image(self, obj):
+        # Product.image is a CharField containing the URL directly
         if obj.product.image:
-            return self.context['request'].build_absolute_uri(obj.product.image.url)
+            # If it's already a full http/https link (e.g. Cloudinary), return it directly
+            if obj.product.image.startswith('http'):
+                return obj.product.image
+            return self.context['request'].build_absolute_uri(obj.product.image)
+            
         # Try to get the first product image if main image is not available
         first_image = obj.product.images.filter(is_primary=True).first()
-        if first_image: 
-            return self.context['request'].build_absolute_uri(first_image.image.url)
-        # Return the first available image
-        first_image = obj.product.images.first()
-        if first_image:
-            return self.context['request'].build_absolute_uri(first_image.image.url)
+        if not first_image:
+            first_image = obj.product.images.first()
+            
+        if first_image and first_image.image:
+            if first_image.image.startswith('http'):
+                return first_image.image
+            return self.context['request'].build_absolute_uri(first_image.image)
+            
         return None
 
 class CartSerializer(serializers.ModelSerializer):
