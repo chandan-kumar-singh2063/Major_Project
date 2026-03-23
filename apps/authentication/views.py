@@ -200,7 +200,9 @@ class PasswordResetAPIView(APIView):
         if not email:
             return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.filter(email=email).first()
+            if not user:
+                return Response({'success': 'If an account exists for this email, a reset link has been sent.'})
         except Exception:
             # For security, do not reveal if the email is not registered
             return Response({'success': 'If an account exists for this email, a reset link has been sent.'})
@@ -280,15 +282,25 @@ class CustomGoogleLogin(SocialLoginView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 
-                # Get or create user
-                user, created = User.objects.get_or_create(
-                    email=email,
-                    defaults={
-                        'username': email.split('@')[0],
-                        'first_name': idinfo.get('given_name', ''),
-                        'last_name': idinfo.get('family_name', ''),
-                    }
-                )
+                # Get or create user safely to avoid MultipleObjectsReturned
+                user = User.objects.filter(email=email).first()
+                created = False
+                if not user:
+                    # Generate a unique username
+                    base_username = email.split('@')[0]
+                    username = base_username
+                    counter = 1
+                    while User.objects.filter(username=username).exists():
+                        username = f"{base_username}{counter}"
+                        counter += 1
+                        
+                    user = User.objects.create(
+                        email=email,
+                        username=username,
+                        first_name=idinfo.get('given_name', ''),
+                        last_name=idinfo.get('family_name', '')
+                    )
+                    created = True
                 
                 print(f"✅ User {'created' if created else 'found'}: {user.email}")
                 

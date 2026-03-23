@@ -22,9 +22,8 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         password = attrs.get('password')
         
         # Find user by email
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
+        user = User.objects.filter(email=email).first()
+        if not user:
             raise serializers.ValidationError('No account found with this email address.')
         
         # Check if password is correct
