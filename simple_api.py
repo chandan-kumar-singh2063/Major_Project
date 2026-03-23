@@ -27,6 +27,7 @@ app.add_middleware(
 # Configuration
 HF_TOKEN = os.getenv("HF_TOKEN", "")
 HF_MODEL = "nigamyadav72/vit-ecommerce-classifier"
+# Official HF Inference API endpoint
 HF_INFERENCE_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
 
 headers = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
