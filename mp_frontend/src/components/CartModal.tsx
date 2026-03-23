@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
+import api from "@/api/config";
 import {
   X,
   Trash2,
@@ -46,29 +47,18 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
     try {
       setCheckoutLoading(true);
 
-      const response = await fetch(
-        "http://localhost:8000/api/payment/khalti/initiate/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            amount: Math.round(cartTotal * 100), // paisa
-            name: "Cart Checkout",
-            email: "customer@example.com",
-          }),
-        }
-      );
+      const response = await api.post("/payment/khalti/initiate/", {
+        amount: Math.round(cartTotal * 100), // paisa
+        name: "Cart Checkout",
+        email: "customer@example.com",
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Payment failed");
-      }
+      const data = response.data;
 
       if (data.payment_url) {
         window.location.href = data.payment_url;
+      } else {
+        throw new Error(data?.message || "Payment failed");
       }
     } catch (error) {
       console.error("Checkout error:", error);

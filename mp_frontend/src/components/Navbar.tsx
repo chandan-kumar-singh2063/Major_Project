@@ -14,6 +14,7 @@ import { authAPI } from '@/api/services';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import axios from 'axios';
+import api from '@/api/config';
 
 const categories = ['Electronics', 'Fashion', 'Books', 'Home_Decor', 'Gadgets'];
 
@@ -174,7 +175,7 @@ export default function Navbar() {
 
       if (skuList.length > 0) {
         // Step 2: Get full product details from main API
-        const djangoResponse = await axios.post("http://localhost:8000/api/products/by-skus/", {
+        const djangoResponse = await api.post("/products/by-skus/", {
           skus: skuList
         });
 
@@ -217,7 +218,7 @@ export default function Navbar() {
       setLoading(true);
 
       // Use the enhanced search API with pagination
-      const response = await axios.get(`http://localhost:8000/api/products/search/`, {
+      const response = await api.get(`/products/search/`, {
         params: {
           q: searchQuery.trim(),
           page: 1,

@@ -84,9 +84,14 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.NOTICE(f"Skipping: {name} (Already in DB)"))
                     return
 
-                # Check local path
+                # Check local path — try direct path first, then category subfolder
                 local_img_path = os.path.join(self.media_base, data_folder, image_filename)
-                if not os.path.exists(local_img_path): return
+                if not os.path.exists(local_img_path):
+                    # For old_data, images may be inside category subfolder
+                    category_name = row.get('Category', '')
+                    local_img_path = os.path.join(self.media_base, data_folder, category_name, image_filename)
+                    if not os.path.exists(local_img_path):
+                        return  # Image truly not found
 
                 # Upload to Cloudinary
                 upload_result = cloudinary.uploader.upload(

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, Package, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '@/api/config';
 import OptimizedImage from './OptimizedImage';
 
 interface Category {
@@ -36,7 +36,7 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
 
     useEffect(() => {
         if (isOpen) {
-            axios.get('http://localhost:8000/api/categories/')
+            api.get('/categories/')
                 .then(res => setCategories(res.data))
                 .catch(err => console.error('Failed to fetch categories:', err));
         }
@@ -75,10 +75,9 @@ const AddProductModal = ({ isOpen, onClose, onSuccess }: AddProductModalProps) =
                 formData.append('image', imageFile);
             }
 
-            await axios.post('http://localhost:8000/api/products/', formData, {
+            await api.post('/products/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${localStorage.getItem('access')}`
                 }
             });
 

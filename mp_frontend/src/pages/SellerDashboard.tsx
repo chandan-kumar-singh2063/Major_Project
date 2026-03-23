@@ -5,7 +5,7 @@ import AddProductModal from '@/components/AddProductModal';
 import OptimizedImage from '@/components/OptimizedImage';
 import { Package, Plus, Trash2, Edit, ShoppingBag, AlertCircle, DollarSign, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '@/api/config';
 
 interface Product {
     id: number;
@@ -44,13 +44,10 @@ const SellerDashboard = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const authHeader = {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` }
-            };
 
             const [productsRes, statsRes] = await Promise.all([
-                axios.get('http://localhost:8000/api/products/my-products/', authHeader),
-                axios.get('http://localhost:8000/api/products/stats/', authHeader)
+                api.get('/products/my-products/'),
+                api.get('/products/stats/')
             ]);
 
             setProducts(productsRes.data.results || productsRes.data);
@@ -66,9 +63,7 @@ const SellerDashboard = () => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/products/${productId}/`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('access')}` }
-            });
+            await api.delete(`/products/${productId}/`);
             fetchData(); // Refresh data
         } catch (error) {
             console.error('Error deleting product:', error);

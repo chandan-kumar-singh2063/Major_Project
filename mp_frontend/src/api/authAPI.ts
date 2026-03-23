@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios instance with JWT support
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace(/\/api$/, '') : 'https://majorproject-deployment-2hsxl.ondigitalocean.app',
   withCredentials: true, // send cookies if needed
 });
 

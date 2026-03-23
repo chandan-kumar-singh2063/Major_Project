@@ -6,6 +6,7 @@ import Footer from './Footer';
 import OptimizedImage from './OptimizedImage';
 import { productsAPI, wishlistAPI, authAPI } from '@/api/services';
 import { useCart } from '@/contexts/CartContext';
+import api from '@/api/config';
 
 
 
@@ -173,23 +174,16 @@ const ProductDetailPage = () => {
       setCartLoading(true);
       setErrorMsg(null);
 
-      const response = await fetch("http://localhost:8000/api/payment/khalti/initiate/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: Math.round(productPrice * 100), // Khalti expects amount in paisa
-          name: product.name,
-          email: "customer@example.com",
-          shipping_address: profile?.address || "Remote (Paid via Khalti)",
-          purchase_order_id: `BUY_NOW_${product.sku || product.id}_${Date.now()}`,
-          purchase_order_name: product.name
-        }),
-
+      const response = await api.post("/payment/khalti/initiate/", {
+        amount: Math.round(productPrice * 100), // Khalti expects amount in paisa
+        name: product.name,
+        email: "customer@example.com",
+        shipping_address: profile?.address || "Remote (Paid via Khalti)",
+        purchase_order_id: `BUY_NOW_${product.sku || product.id}_${Date.now()}`,
+        purchase_order_name: product.name
       });
 
-      const data = await response.json();
+      const data = response.data;
 
       if (data.pidx && data.payment_url) {
         window.location.href = data.payment_url;
