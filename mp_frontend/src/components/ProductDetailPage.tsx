@@ -22,7 +22,8 @@ interface Product {
   stock?: number;
   stock_status?: string;
   image?: string;
-  images?: string[];
+  image_url?: string;
+  images?: any[];
   description?: string;
   category_name?: string;
   sku?: string;
@@ -274,12 +275,19 @@ const ProductDetailPage = () => {
     );
   }
 
-  // Generate images array if only single image exists
-  const productImages = product.images && product.images.length > 0
-    ? product.images
-    : product.image
-      ? [product.image]
-      : ['https://via.placeholder.com/500x500?text=No+Image'];
+  // Generate images array handling potentially different API response structures
+  let extractedImages: string[] = [];
+  if (product.images && product.images.length > 0) {
+    extractedImages = product.images.map((img: any) => typeof img === 'string' ? img : img.image).filter(Boolean);
+  } else if (product.image_url) {
+    extractedImages = [product.image_url];
+  } else if (product.image) {
+    extractedImages = [product.image];
+  }
+  
+  const productImages = extractedImages.length > 0 
+    ? extractedImages 
+    : ['https://via.placeholder.com/500x500?text=No+Image'];
 
   // Add fallback values for missing data
   const productName = product.name || 'Product Name Not Available';
