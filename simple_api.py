@@ -26,7 +26,7 @@ app.add_middleware(
 # Configuration
 HF_TOKEN = os.getenv("HF_TOKEN")  # Will be set in DO environment
 HF_MODEL = "nigamyadav72/vit-ecommerce-classifier"
-HF_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
+HF_URL = f"https://router.huggingface.co/hf-inference/models/{HF_MODEL}"
 HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
 
 @app.get("/")

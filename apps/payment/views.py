@@ -1,5 +1,5 @@
-# backend/payments/views.py
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 import requests
@@ -147,6 +147,7 @@ def verify_khalti_payment(request):
 from django.http import HttpResponse
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def payment_success(request):
     """
     Payment success callback endpoint for Khalti.
@@ -239,30 +240,30 @@ def payment_success(request):
         <script>
             function closeWindow() {{
                 // Try to close the window/WebView
-                if (window.close) {
+                if (window.close) {{
                     window.close();
-                }
+                }}
                 // Also try history.back as fallback
-                setTimeout(() => {
-                    if (window.history.length > 1) {
+                setTimeout(() => {{
+                    if (window.history.length > 1) {{
                         window.history.back();
-                    }
-                }, 100);
-            }
+                    }}
+                }}, 100);
+            }}
             
             // Auto-close after 3 seconds
             let count = 3;
             const msgEl = document.getElementById('auto-close-msg');
             
-            const countdown = setInterval(() => {
-                msgEl.textContent = `Auto-closing in ${count} seconds...`;
+            const countdown = setInterval(() => {{
+                msgEl.textContent = `Auto-closing in ${{count}} seconds...`;
                 count--;
                 
-                if (count < 0) {
+                if (count < 0) {{
                     clearInterval(countdown);
                     closeWindow();
-                }
-            }, 1000);
+                }}
+            }}, 1000);
         </script>
     </body>
     </html>
