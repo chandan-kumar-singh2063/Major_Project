@@ -166,7 +166,8 @@ export default function Navbar() {
 
     try {
       // Step 1: Get similar products from image processing service
-      const fastApiResponse = await axios.post("http://localhost:8001/search-image/", formData, {
+      const apiUrl = import.meta.env.VITE_SEARCH_API_URL || import.meta.env.VITE_MODEL_URL || "http://localhost:8001";
+      const fastApiResponse = await axios.post(`${apiUrl}/search-image/`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
