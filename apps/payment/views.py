@@ -159,46 +159,53 @@ def payment_success(request):
     
     print(f"✅ Payment Success Callback - PIDX: {pidx}, Status: {status_param}, TxnID: {transaction_id}")
     
-    # Return a simple HTML page that the SDK can load
-    html_content = """
+    is_success = str(status_param).lower() in ['completed', 'success', 'n/a']  # default n/a to success for legacy
+    
+    title = "Payment Successful!" if is_success else "Payment Cancelled/Failed"
+    message = "Your payment has been processed successfully." if is_success else "Your payment process did not complete."
+    icon = "✓" if is_success else "✕"
+    color1 = "#667eea" if is_success else "#ff6a00"
+    color2 = "#764ba2" if is_success else "#ee0979"
+
+    html_content = f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Payment Successful</title>
+        <title>{title}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            body {
+            body {{
                 font-family: Arial, sans-serif;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 height: 100vh;
                 margin: 0;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, {color1} 0%, {color2} 100%);
                 color: white;
-            }
-            .container {
+            }}
+            .container {{
                 text-align: center;
                 padding: 2rem;
-            }
-            .checkmark {
+            }}
+            .checkmark {{
                 font-size: 4rem;
                 margin-bottom: 1rem;
                 animation: scaleIn 0.5s ease-out;
-            }
-            @keyframes scaleIn {
-                from { transform: scale(0); }
-                to { transform: scale(1); }
-            }
-            h1 {
+            }}
+            @keyframes scaleIn {{
+                from {{ transform: scale(0); }}
+                to {{ transform: scale(1); }}
+            }}
+            h1 {{
                 font-size: 2rem;
                 margin-bottom: 0.5rem;
-            }
-            p {
+            }}
+            p {{
                 font-size: 1rem;
                 opacity: 0.9;
-            }
-            .close-button {
+            }}
+            .close-button {{
                 margin-top: 2rem;
                 padding: 1rem 2rem;
                 font-size: 1rem;
@@ -209,28 +216,28 @@ def payment_success(request):
                 border-radius: 8px;
                 cursor: pointer;
                 transition: all 0.3s;
-            }
-            .close-button:hover {
+            }}
+            .close-button:hover {{
                 background: rgba(255, 255, 255, 0.3);
                 transform: scale(1.05);
-            }
-            .countdown {
+            }}
+            .countdown {{
                 font-size: 0.875rem;
                 margin-top: 1rem;
                 opacity: 0.8;
-            }
+            }}
         </style>
     </head>
     <body>
         <div class="container">
-            <div class="checkmark">✓</div>
-            <h1>Payment Successful!</h1>
-            <p>Your payment has been processed successfully.</p>
+            <div class="checkmark">{icon}</div>
+            <h1>{title}</h1>
+            <p>{message}</p>
             <button class="close-button" onclick="closeWindow()">Return to App</button>
             <p class="countdown" id="auto-close-msg"></p>
         </div>
         <script>
-            function closeWindow() {
+            function closeWindow() {{
                 // Try to close the window/WebView
                 if (window.close) {
                     window.close();
