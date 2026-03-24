@@ -204,6 +204,7 @@ export default function SearchResults() {
                           <div className="relative h-60 overflow-hidden">
                             <OptimizedImage
                               src={
+                                product.image_url ||
                                 product.image ||
                                 product.image_path ||
                                 "/placeholder.png"
