@@ -33,8 +33,8 @@ def initiate_khalti_payment(request):
         print("🌐 Calling Khalti API...")
         
         # Build return_url pointing to the React frontend payment-success page
-        # VITE_SITE_URL is the frontend URL (e.g. http://localhost:5173 in dev, or production URL)
-        frontend_url = os.environ.get('VITE_SITE_URL', 'http://localhost:5173')
+        # fallback if not provided
+        frontend_url = os.environ.get('VITE_SITE_URL', 'https://majorproject-deployment-2hsxl.ondigitalocean.app')
         return_url = data.get('return_url') or f"{frontend_url}/payment-success"
         website_url = data.get('website_url') or frontend_url
         
