@@ -3,8 +3,7 @@ import { Search, Sparkles, TrendingUp, Camera, Percent } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { categoriesAPI } from '@/api/services';
 import OptimizedImage from './OptimizedImage';
-
-// Removed hardcoded featuredCategories
+import { BASE_URL } from '@/api/config';
 
 const trendingProducts = [
   { name: 'Noise Cancelling Headphones', image: '/assets/noise cancelling headphone.jpg', price: '$199' },
@@ -20,28 +19,23 @@ const salesProducts = [
   { name: 'Stylish Sneakers', image: '/assets/sneaker.jpg', oldPrice: '$129', newPrice: '$89', discount: '31%' },
 ];
 
-import { BASE_URL } from '@/api/config';
-
 // Helper to get full image URL from backend
 const getImageUrl = (path: string) => {
   if (!path) return '';
-  // 1. If it's already a full URL (Cloudinary or absolute), return it
+
+  // Already a full URL (Cloudinary or absolute)
   if (path.startsWith('http')) return path;
-  
-  // 2. Prepare the backend domain (strip /api)
+
+  // Prepare the backend domain (strip /api)
   const backendUrl = BASE_URL.replace('/api', '');
-  
-  // 3. Robust path joining with /media/ detection
-  // Django media usually lives at /media/, so if path is relative and doesn't start with media, we add it
-  let adjustedPath = path;
-  if (!path.startsWith('/') && !path.startsWith('media/')) {
-    adjustedPath = `/media/${path}`;
-  } else if (path.startsWith('/') && !path.startsWith('/media/')) {
-    adjustedPath = `/media${path}`;
-  }
-  
-  const finalPath = adjustedPath.startsWith('/') ? adjustedPath : `/${adjustedPath}`;
-  return `${backendUrl}${finalPath}`;
+
+  // Normalize: remove leading slash, then prefix with /media/ only if not already there
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  const mediaPath = cleanPath.startsWith('media/')
+    ? `/${cleanPath}`
+    : `/media/${cleanPath}`;
+
+  return `${backendUrl}${mediaPath}`;
 };
 
 export default function HomeContent() {
@@ -56,8 +50,8 @@ export default function HomeContent() {
     }
 
     categoriesAPI.getAll().then((res: any) => {
-      // Check if backend uses pagination (res.data.results)
       const dataArray = res.data.results ? res.data.results : res.data;
+      console.log('Categories:', dataArray); // helpful for debugging image paths
       setCategories(dataArray as Category[]);
     });
   }, []);
@@ -69,13 +63,13 @@ export default function HomeContent() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="relative bg-primary dark:text-white border-amber-50 text-white dark:bg-accent  text-center py-24 px-4 rounded-3xl shadow-2xl mx-4 md:mx-20"
+        className="relative bg-primary dark:text-white border-amber-50 text-white dark:bg-accent text-center py-24 px-4 rounded-3xl shadow-2xl mx-4 md:mx-20"
       >
         <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
           Find Anything Using Just an Image
         </h1>
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">
-          Our AI-powered Visual Transformer technology helps you search and shop effortlessly. Snap it, upload it, and discover exactly what you’re looking for.
+          Our AI-powered Visual Transformer technology helps you search and shop effortlessly. Snap it, upload it, and discover exactly what you're looking for.
         </p>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -104,16 +98,16 @@ export default function HomeContent() {
               whileHover={{ scale: 1.05 }}
               className="group relative rounded-xl overflow-hidden shadow-lg aspect-[4/3] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4"
             >
-              {cat.image && (
-                <OptimizedImage
+              {cat.image ? (
+                <img
                   src={getImageUrl(cat.image)}
                   alt={cat.name}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 z-0"
-                  maxWidth={400}
-                  maxHeight={300}
-                  quality={0.7}
                 />
-              )}
+              ) : null}
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition z-10" />
               <h3 className="relative z-20 text-lg md:text-xl font-bold text-white text-center break-words w-full">
                 {cat.name}
@@ -167,7 +161,7 @@ export default function HomeContent() {
         </div>
       </motion.section>
 
-      {/* 🔥 Sales Section */}
+      {/* Sales Section */}
       <motion.section
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -194,7 +188,14 @@ export default function HomeContent() {
               whileHover={{ scale: 1.05 }}
               className="relative bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden"
             >
-              <OptimizedImage src={item.image} alt={item.name} className="w-full aspect-square object-cover" maxWidth={400} maxHeight={400} quality={0.75} />
+              <OptimizedImage
+                src={item.image}
+                alt={item.name}
+                className="w-full aspect-square object-cover"
+                maxWidth={400}
+                maxHeight={400}
+                quality={0.75}
+              />
               <div className="p-4">
                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">{item.name}</h4>
                 <div className="flex items-center gap-2 text-sm">
