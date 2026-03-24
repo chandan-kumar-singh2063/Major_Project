@@ -189,12 +189,7 @@ const ProductDetailPage = () => {
 
       const data = response.data;
       if (data.pidx && data.payment_url) {
-        // Open Khalti in a new tab so the main React app never closes
-        const newWindow = window.open(data.payment_url, "_blank");
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-          // If popup blocked, fallback to same-tab redirect
-          window.location.assign(data.payment_url);
-        }
+        window.location.href = data.payment_url;
       } else {
         setErrorMsg('Failed to initiate payment. Please try again.');
       }
