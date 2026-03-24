@@ -52,14 +52,14 @@ export default function HomeContent() {
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">
           Our AI-powered Visual Transformer technology helps you search and shop effortlessly. Snap it, upload it, and discover exactly what you’re looking for.
         </p>
-        <motion.a
+        <motion.button
           whileHover={{ scale: 1.05 }}
-          href="#image-search"
+          onClick={() => window.dispatchEvent(new Event('openImageSearch'))}
           className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-full shadow-lg dark:text-black hover:bg-gray-100 transition"
         >
           <Camera className="w-5 h-5" />
           Try Image Search
-        </motion.a>
+        </motion.button>
       </motion.section>
 
       {/* Featured categories (from backend) */}
@@ -220,14 +220,14 @@ export default function HomeContent() {
         <p className="max-w-2xl mx-auto mb-8 text-lg">
           Upload an image, and let our AI find the exact match for you.
         </p>
-        <motion.a
-          href="#image-search"
+        <motion.button
+          onClick={() => window.dispatchEvent(new Event('openImageSearch'))}
           whileHover={{ scale: 1.05 }}
           className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-bold rounded-full shadow-lg hover:bg-gray-100 transition"
         >
           <Camera className="w-5 h-5" />
           Start Image Search
-        </motion.a>
+        </motion.button>
       </motion.section>
     </div>
   );

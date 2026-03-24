@@ -168,7 +168,7 @@ export default function Navbar() {
     try {
       // Step 1: Get similar products from HuggingFace Space image search service
       const apiUrl = import.meta.env.VITE_SEARCH_API_URL || import.meta.env.VITE_MODEL_URL || "http://localhost:8001";
-      
+
       let fastApiResponse;
       try {
         fastApiResponse = await axios.post(`${apiUrl}/search-image/`, formData, {
@@ -352,6 +352,20 @@ export default function Navbar() {
   };
 
   const togglePlay = () => setIsPlaying(!isPlaying);
+
+  // Listen for the custom event emitted by HomeContent (or any other component)
+  useEffect(() => {
+    const handleOpenImageSearch = () => {
+      setSearchMode('image');
+      setShowImageOptions(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('openImageSearch', handleOpenImageSearch);
+    
+    // Clean up event listener when Navbar unmounts
+    return () => window.removeEventListener('openImageSearch', handleOpenImageSearch);
+  }, []);
 
   return (
     <>
