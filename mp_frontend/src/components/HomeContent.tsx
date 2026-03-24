@@ -25,9 +25,23 @@ import { BASE_URL } from '@/api/config';
 // Helper to get full image URL from backend
 const getImageUrl = (path: string) => {
   if (!path) return '';
+  // 1. If it's already a full URL (Cloudinary or absolute), return it
   if (path.startsWith('http')) return path;
+  
+  // 2. Prepare the backend domain (strip /api)
   const backendUrl = BASE_URL.replace('/api', '');
-  return `${backendUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  
+  // 3. Robust path joining with /media/ detection
+  // Django media usually lives at /media/, so if path is relative and doesn't start with media, we add it
+  let adjustedPath = path;
+  if (!path.startsWith('/') && !path.startsWith('media/')) {
+    adjustedPath = `/media/${path}`;
+  } else if (path.startsWith('/') && !path.startsWith('/media/')) {
+    adjustedPath = `/media${path}`;
+  }
+  
+  const finalPath = adjustedPath.startsWith('/') ? adjustedPath : `/${adjustedPath}`;
+  return `${backendUrl}${finalPath}`;
 };
 
 export default function HomeContent() {
@@ -37,6 +51,7 @@ export default function HomeContent() {
     interface Category {
       id: number;
       name: string;
+      slug: string;
       image: string;
     }
 
@@ -85,7 +100,7 @@ export default function HomeContent() {
           {categories.slice(0, 8).map((cat) => (
             <motion.a
               key={cat.id}
-              href={`/category/${cat.name.toLowerCase()}`}
+              href={`/category/${cat.slug}`}
               whileHover={{ scale: 1.05 }}
               className="group relative rounded-xl overflow-hidden shadow-lg aspect-[4/3] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4"
             >
