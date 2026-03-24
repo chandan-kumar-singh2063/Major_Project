@@ -164,46 +164,51 @@ export default function Navbar() {
     const formData = new FormData();
     formData.append("file", searchImage);
 
+    setLoading(true);
     try {
-      // Step 1: Get similar products from image processing service
+      // Step 1: Get similar products from HuggingFace Space image search service
       const apiUrl = import.meta.env.VITE_SEARCH_API_URL || import.meta.env.VITE_MODEL_URL || "http://localhost:8001";
-      const fastApiResponse = await axios.post(`${apiUrl}/search-image/`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
+      
+      let fastApiResponse;
+      try {
+        fastApiResponse = await axios.post(`${apiUrl}/search-image/`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 90000, // 90s — HuggingFace free tier can take 30-60s to wake up
+        });
+      } catch (axiosErr: any) {
+        if (axiosErr.code === 'ECONNABORTED' || axiosErr.message?.includes('timeout')) {
+          alert("The image search service is starting up (it may have been sleeping). Please wait 30 seconds and try again.");
+        } else {
+          alert("Could not reach the image search service. Please try again later.");
+        }
+        return;
+      }
 
-      const matchedResults = fastApiResponse.data.results;
+      const matchedResults = fastApiResponse.data.results || [];
       const skuList = matchedResults.map((item: { sku: string }) => item.sku);
 
       if (skuList.length > 0) {
-        // Step 2: Get full product details from main API
-        const djangoResponse = await api.post("/products/by-skus/", {
-          skus: skuList
-        });
-
+        // Step 2: Get full product details from main Django API
+        const djangoResponse = await api.post("/products/by-skus/", { skus: skuList });
         const products: Product[] = djangoResponse.data;
 
-        // Step 3: Combine data with similarity scores
+        // Step 3: Merge with similarity scores
         const mergedResults = products.map(product => {
           const match = matchedResults.find((m: { sku: string }) => m.sku === String(product.sku));
-          return {
-            ...product,
-            similarity: match?.similarity ?? null
-          };
+          return { ...product, similarity: match?.similarity ?? null };
         });
 
-        // Step 4: Navigate to results page
         navigate("/search-results", {
-          state: {
-            results: mergedResults,
-            searchType: "image"
-          }
+          state: { results: mergedResults, searchType: "image" }
         });
       } else {
-        alert("No similar products found.");
+        alert("No similar products found. Try a clearer product photo.");
       }
     } catch (err) {
-      console.error("Search failed:", err);
+      console.error("Image search failed:", err);
       alert("Image search failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
