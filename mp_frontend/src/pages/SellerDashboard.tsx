@@ -13,7 +13,7 @@ interface Product {
     price: number;
     stock: number;
     category_name: string;
-    image?: string;
+    image_url?: string;
     seller: number;
     sku: string;
     sales_count: number;
