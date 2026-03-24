@@ -32,7 +32,7 @@ interface OrderItem {
     product: {
         id: number;
         name: string;
-        image: string;
+        image_url: string;
         price: number;
         sku?: string;
     };
@@ -180,7 +180,7 @@ const OrdersPage = () => {
                                                 <div key={item.id} className="flex gap-4">
                                                     <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden flex-shrink-0">
                                                         <OptimizedImage
-                                                            src={item.product?.image || 'https://via.placeholder.com/64'}
+                                                            src={item.product?.image_url || 'https://via.placeholder.com/64'}
                                                             alt={item.product?.name}
                                                             className="w-full h-full object-cover"
                                                             maxWidth={100}
