@@ -47,10 +47,13 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
     try {
       setCheckoutLoading(true);
 
+      const returnUrl = `${window.location.origin}/payment-success`;
       const response = await api.post("/payment/khalti/initiate/", {
         amount: Math.round(cartTotal * 100), // paisa
         name: "Cart Checkout",
         email: "customer@example.com",
+        return_url: returnUrl,
+        website_url: window.location.origin,
       });
 
       const data = response.data;

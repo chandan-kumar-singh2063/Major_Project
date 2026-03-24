@@ -32,11 +32,11 @@ def initiate_khalti_payment(request):
         
         print("🌐 Calling Khalti API...")
         
-        # Get return_url and website_url from request
-        # Default to web app URLs (mobile SDK handles callbacks internally)
-        web_url = os.environ.get('VITE_SITE_URL', 'http://localhost:5173')
-        return_url = data.get('return_url') or f"{web_url}/payment-success"
-        website_url = data.get('website_url') or web_url
+        # Build return_url pointing to the React frontend payment-success page
+        # VITE_SITE_URL is the frontend URL (e.g. http://localhost:5173 in dev, or production URL)
+        frontend_url = os.environ.get('VITE_SITE_URL', 'http://localhost:5173')
+        return_url = data.get('return_url') or f"{frontend_url}/payment-success"
+        website_url = data.get('website_url') or frontend_url
         
         print(f"🔗 Return URL: {return_url}")
         print(f"🌐 Website URL: {website_url}")

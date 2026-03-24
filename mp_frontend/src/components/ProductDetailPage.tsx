@@ -175,13 +175,16 @@ const ProductDetailPage = () => {
       setCartLoading(true);
       setErrorMsg(null);
 
+      const returnUrl = `${window.location.origin}/payment-success`;
       const response = await api.post("/payment/khalti/initiate/", {
         amount: Math.round(productPrice * 100), // Khalti expects amount in paisa
         name: product.name,
         email: "customer@example.com",
         shipping_address: profile?.address || "Remote (Paid via Khalti)",
         purchase_order_id: `BUY_NOW_${product.sku || product.id}_${Date.now()}`,
-        purchase_order_name: product.name
+        purchase_order_name: product.name,
+        return_url: returnUrl,
+        website_url: window.location.origin,
       });
 
       const data = response.data;
