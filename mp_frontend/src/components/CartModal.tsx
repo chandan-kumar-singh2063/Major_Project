@@ -59,7 +59,12 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
       const data = response.data;
 
       if (data.payment_url) {
-        window.location.href = data.payment_url;
+        // Open Khalti in a new tab so the main React app never closes
+        const newWindow = window.open(data.payment_url, "_blank");
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+          // If popup blocked, fallback to same-tab redirect
+          window.location.assign(data.payment_url);
+        }
       } else {
         throw new Error(data?.message || "Payment failed");
       }
