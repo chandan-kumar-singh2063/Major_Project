@@ -187,6 +187,7 @@ const ProductDetailPage = () => {
         website_url: window.location.origin,
       });
 
+      const data = response.data;
       if (data.pidx && data.payment_url) {
         // Open Khalti in a new tab so the main React app never closes
         const newWindow = window.open(data.payment_url, "_blank");
@@ -197,9 +198,10 @@ const ProductDetailPage = () => {
       } else {
         setErrorMsg('Failed to initiate payment. Please try again.');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Payment initiation error:', error);
-      setErrorMsg('Failed to initiate payment. Please try again.');
+      const backendError = error.response?.data?.error || error.response?.data?.detail || error.message;
+      setErrorMsg(`Failed to initiate payment: ${backendError}`);
     } finally {
       setCartLoading(false);
     }

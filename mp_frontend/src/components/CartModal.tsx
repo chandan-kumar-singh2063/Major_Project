@@ -68,9 +68,10 @@ const CartModal = ({ isOpen, onClose }: CartModalProps) => {
       } else {
         throw new Error(data?.message || "Payment failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Checkout error:", error);
-      alert("Failed to initiate payment");
+      const backendError = error.response?.data?.error || error.response?.data?.detail || error.message;
+      alert(`Failed to initiate payment: ${backendError}`);
     } finally {
       setCheckoutLoading(false);
     }
