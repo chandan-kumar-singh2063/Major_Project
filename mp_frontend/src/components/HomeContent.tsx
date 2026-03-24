@@ -20,6 +20,16 @@ const salesProducts = [
   { name: 'Stylish Sneakers', image: '/assets/sneaker.jpg', oldPrice: '$129', newPrice: '$89', discount: '31%' },
 ];
 
+import { BASE_URL } from '@/api/config';
+
+// Helper to get full image URL from backend
+const getImageUrl = (path: string) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  const backendUrl = BASE_URL.replace('/api', '');
+  return `${backendUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
 export default function HomeContent() {
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -81,7 +91,7 @@ export default function HomeContent() {
             >
               {cat.image && (
                 <OptimizedImage
-                  src={cat.image}
+                  src={getImageUrl(cat.image)}
                   alt={cat.name}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 z-0"
                   maxWidth={400}
