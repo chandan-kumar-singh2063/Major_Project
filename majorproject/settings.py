@@ -139,7 +139,7 @@ WSGI_APPLICATION = 'majorproject.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', 'mysql://root:@127.0.0.1:3306/MajorProject'),
+        default=os.getenv('DATABASE_URL', os.getenv('PROD_DATABASE_URL', 'mysql://root:@127.0.0.1:3306/MajorProject')),
         conn_max_age=600,
         conn_health_checks=True,
     )

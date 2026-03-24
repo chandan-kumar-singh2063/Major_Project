@@ -30,7 +30,11 @@ export default function HomeContent() {
       image: string;
     }
 
-    categoriesAPI.getAll().then((res: any) => setCategories(res.data as Category[]));
+    categoriesAPI.getAll().then((res: any) => {
+      // Check if backend uses pagination (res.data.results)
+      const dataArray = res.data.results ? res.data.results : res.data;
+      setCategories(dataArray as Category[]);
+    });
   }, []);
 
   return (
@@ -67,26 +71,26 @@ export default function HomeContent() {
         className="mt-20 px-4 max-w-7xl mx-auto"
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center">Shop by Categories</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {categories.map((cat) => (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.slice(0, 8).map((cat) => (
             <motion.a
               key={cat.id}
               href={`/category/${cat.name.toLowerCase()}`}
               whileHover={{ scale: 1.05 }}
-              className="group relative rounded-xl overflow-hidden shadow-lg"
+              className="group relative rounded-xl overflow-hidden shadow-lg aspect-[4/3] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center p-4"
             >
               {cat.image && (
                 <OptimizedImage
                   src={cat.image}
                   alt={cat.name}
-                  className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 z-0"
                   maxWidth={400}
                   maxHeight={300}
                   quality={0.7}
                 />
               )}
-              <div className="absolute inset-0 bg-black/5 group-hover:bg-black/10 transition" />
-              <h3 className="absolute bottom-4 left-4 text-lg font-semibold text-white">
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition z-10" />
+              <h3 className="relative z-20 text-lg md:text-xl font-bold text-white text-center break-words w-full">
                 {cat.name}
               </h3>
             </motion.a>
