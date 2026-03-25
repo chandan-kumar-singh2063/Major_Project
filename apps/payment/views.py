@@ -173,98 +173,20 @@ def payment_success(request):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>{title}</title>
+        <title>Processing...</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-                background: linear-gradient(135deg, {color1} 0%, {color2} 100%);
-                color: white;
-            }
-            .container {
-                text-align: center;
-                padding: 2rem;
-            }
-            .checkmark {
-                font-size: 4rem;
-                margin-bottom: 1rem;
-                animation: scaleIn 0.5s ease-out;
-            }
-            @keyframes scaleIn {
-                from { transform: scale(0); }
-                to { transform: scale(1); }
-            }
-            h1 {
-                font-size: 2rem;
-                margin-bottom: 0.5rem;
-            }
-            p {
-                font-size: 1rem;
-                opacity: 0.9;
-            }
-            .close-button {
-                margin-top: 2rem;
-                padding: 1rem 2rem;
-                font-size: 1rem;
-                font-weight: bold;
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-                border: 2px solid white;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-            .close-button:hover {
-                background: rgba(255, 255, 255, 0.3);
-                transform: scale(1.05);
-            }
-            .countdown {
-                font-size: 0.875rem;
-                margin-top: 1rem;
-                opacity: 0.8;
-            }
-        </style>
     </head>
-    <body>
-        <div class="container">
-            <div class="checkmark">{icon}</div>
-            <h1>{title}</h1>
-            <p>{message}</p>
-            <button class="close-button" onclick="closeWindow()">Return to App</button>
-            <p class="countdown" id="auto-close-msg"></p>
-        </div>
+    <body style="background: transparent;">
         <script>
-            function closeWindow() {
-                // Try to close the window/WebView
-                if (window.close) {
-                    window.close();
-                }
-                // Also try history.back as fallback
-                setTimeout(() => {
-                    if (window.history.length > 1) {
-                        window.history.back();
-                    }
-                }, 100);
+            // Instantly close the WebView so Flutter's onReturn fires immediately
+            if (window.close) {
+                window.close();
             }
-            
-            // Auto-close after 3 seconds
-            let count = 3;
-            const msgEl = document.getElementById('auto-close-msg');
-            
-            const countdown = setInterval(() => {
-                msgEl.textContent = `Auto-closing in ${count} seconds...`;
-                count--;
-                
-                if (count < 0) {
-                    clearInterval(countdown);
-                    closeWindow();
+            setTimeout(() => {
+                if (window.history.length > 1) {
+                    window.history.back();
                 }
-            }, 1000);
+            }, 50);
         </script>
     </body>
     </html>
