@@ -2,10 +2,23 @@ from rest_framework import serializers
 from .models import Product, Brand, ProductImage, ProductAttribute, ProductReview
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'alt_text', 'is_primary', 'created_at']
         read_only_fields = ['created_at']
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        image_str = str(obj.image)
+        if image_str.startswith('http'):
+            return image_str
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,10 +26,23 @@ class ProductAttributeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'value']
 
 class BrandSerializer(serializers.ModelSerializer):
+    logo = serializers.SerializerMethodField()
+    
     class Meta:
         model = Brand
         fields = ['id', 'name', 'slug', 'logo', 'description', 'is_active', 'created_at']
         read_only_fields = ['slug', 'created_at']
+
+    def get_logo(self, obj):
+        if not obj.logo:
+            return None
+        logo_str = str(obj.logo)
+        if logo_str.startswith('http'):
+            return logo_str
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.logo.url)
+        return obj.logo.url
 
 class ProductReviewSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
@@ -61,15 +87,18 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
 
     def get_image_url(self, obj):
-        if obj.image:
-            if isinstance(obj.image, str):
-                return obj.image
-            try:
-                # In case it's still a file object locally
-                return obj.image.url
-            except:
-                return None
-        return None
+        if not obj.image:
+            return None
+        image_str = str(obj.image)
+        if image_str.startswith('http'):
+            return image_str
+        try:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        except:
+            return None
 
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()

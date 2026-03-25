@@ -9,6 +9,8 @@ class CategorySerializer(serializers.ModelSerializer):
     product_count = serializers.SerializerMethodField()
     subcategories = serializers.SerializerMethodField()
     parent_name = serializers.CharField(source='parent.name', read_only=True)
+    image = serializers.SerializerMethodField()
+
     
     class Meta:
         model = Category
@@ -30,6 +32,17 @@ class CategorySerializer(serializers.ModelSerializer):
     
     def get_product_count(self, obj):
         return obj.products.filter(is_active=True).count()
+    
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        image_str = str(obj.image)
+        if image_str.startswith('http'):
+            return image_str
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
     
     def get_subcategories(self, obj):
         if obj.parent is None:  # Only show subcategories for main categories
@@ -93,6 +106,9 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_primary_image(self, obj):
         primary_image = obj.images.filter(is_primary=True).first()
         if primary_image:
+            image_str = str(primary_image.image)
+            if image_str.startswith('http'):
+                return image_str
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(primary_image.image.url)
@@ -106,6 +122,7 @@ class CategoryWithProductsSerializer(serializers.ModelSerializer):
     """
     products = ProductSerializer(many=True, read_only=True)
     product_count = serializers.ReadOnlyField()
+    image = serializers.SerializerMethodField()
     
     class Meta:
         model = Category
@@ -122,3 +139,14 @@ class CategoryWithProductsSerializer(serializers.ModelSerializer):
             'updated_at'
         ]
         read_only_fields = ['slug', 'created_at', 'updated_at']
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        image_str = str(obj.image)
+        if image_str.startswith('http'):
+            return image_str
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
