@@ -173,7 +173,7 @@ export default function BooksContent() {
         className="mt-24 px-4 max-w-7xl mx-auto"
       >
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Books in this Category</h2>
-        <HybridPaginatedProductsList categoryId={1} />
+        <HybridPaginatedProductsList categoryId={13} />
       </motion.section>
 
       {/* Personalized Recommendations */}

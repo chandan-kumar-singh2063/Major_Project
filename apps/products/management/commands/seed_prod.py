@@ -40,9 +40,10 @@ class Command(BaseCommand):
             settings.DATABASES['default'] = parsed
 
         if options.get('clear', False):
-            self.stdout.write(self.style.WARNING("Clearing all existing products from the database..."))
+            self.stdout.write(self.style.WARNING("Clearing all existing products and categories from the database..."))
             Product.objects.all().delete()
-            self.stdout.write(self.style.SUCCESS("Products cleared."))
+            Category.objects.all().delete()
+            self.stdout.write(self.style.SUCCESS("Products and categories cleared."))
 
         csv_path = os.path.join(settings.BASE_DIR, 'media', 'model_train', 'fine_tuned', 'combined_csv_for_image_search.csv')
         if not os.path.exists(csv_path):
@@ -68,7 +69,12 @@ class Command(BaseCommand):
         
         category_map = {}
         for cat_name in unique_categories:
-            cat, _ = Category.objects.get_or_create(name=cat_name)
+            # Case-insensitive get_or_create to avoid duplicate slug issues
+            name_to_use = cat_name.replace('_', ' ').replace('-', ' ').title()
+            cat, created = Category.objects.get_or_create(
+                name__iexact=name_to_use,
+                defaults={'name': name_to_use}
+            )
             category_map[cat_name] = cat
 
         existing_skus = set(Product.objects.values_list('sku', flat=True))
@@ -113,7 +119,7 @@ class Command(BaseCommand):
         products_to_create = []
         successful_uploads = 0
         
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=25) as executor:
             future_to_row = {executor.submit(upload_to_cloudinary, row): row for row in reader}
             for future in as_completed(future_to_row):
                 result = future.result()

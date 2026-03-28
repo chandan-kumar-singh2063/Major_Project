@@ -1,0 +1,48 @@
+graph TB
+    subgraph Clients["👥 Clients"]
+        direction TB
+        Web["React Frontend Web App<br/>(Vite, Tailwind)"]
+        Mobile["Flutter Mobile App<br/>(E-Pasal)"]
+    end
+
+    subgraph BackendSys["⚙️ Backend System"]
+        direction TB
+        API["Django Core Backend<br/>REST API, Auth, Cart, Orders"]
+        AIService["AI Image Search API<br/>(FastAPI)"]
+    end
+
+    subgraph Config["🔌 External Integrations"]
+        direction TB
+        Payment["Khalti Payment Gateway"]
+        HuggingFace["Hugging Face API<br/>(ViT Image Classification)"]
+        OAuth["Google OAuth"]
+    end
+
+    subgraph Storage["💾 Data & Media Storage"]
+        direction TB
+        NeonDB[("Neon Serverless PostgreSQL")]
+        Cloudinary[("Cloudinary Storage<br/>(Images/Media)")]
+    end
+
+    Web -->|REST| API
+    Mobile -->|REST| API
+    Web -.->|Login| OAuth
+    Mobile -.->|Login| OAuth
+    
+    API -->|Search Req| AIService
+    
+    API -->|SQL Queries| NeonDB
+    API -->|Media Uploads| Cloudinary
+    
+    AIService -->|Extract Features| HuggingFace
+    
+    API -->|Verify| Payment
+    Mobile -.->|Initiate| Payment
+
+    classDef backend fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef client fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef db fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px;
+    
+    class Web,Mobile client
+    class API,AIService backend
+    class NeonDB,Cloudinary db
