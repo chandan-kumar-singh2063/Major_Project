@@ -47,7 +47,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
               <X size={20} className="text-red-500" />
             </button>
 
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Feedback</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Share Feedback</h2>
 
             {submitted ? (
               <motion.div
@@ -80,7 +80,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                   placeholder="Let us know what you think..."
                   className="w-full p-3 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 ></textarea>
-                
+
                 <motion.button
                   onClick={handleSubmit}
                   whileTap={{ scale: 0.95 }}

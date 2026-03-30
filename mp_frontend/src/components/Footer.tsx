@@ -81,7 +81,7 @@ const Footer = () => {
               {[
                 { name: "Home", to: "/" },
                 { name: "Shop Collections", to: "/category/fashion" },
-                { name: "About Our Story", to: "/aboutus" },
+                { name: "Meet Our Teams", to: "/aboutus" },
                 { name: "Get in Touch", to: "/contactus" },
               ].map((link) => (
                 <li key={link.name}>
@@ -101,7 +101,7 @@ const Footer = () => {
                   className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-accent transition-colors flex items-center group"
                 >
                   <span className="w-0 group-hover:w-4 h-0.5 bg-primary mr-0 group-hover:mr-2 transition-all duration-300 opacity-0 group-hover:opacity-100" />
-                  Share Feedback
+                  Feedback
                 </button>
               </li>
             </ul>
@@ -123,7 +123,7 @@ const Footer = () => {
                 <div className="p-2 rounded-lg bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
                   <FaPhoneAlt size={14} />
                 </div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">+977 9811122233</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">+977 9806285040</span>
               </li>
               <li className="flex items-center gap-3 group">
                 <div className="p-2 rounded-lg bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">

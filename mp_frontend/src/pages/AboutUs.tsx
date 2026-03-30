@@ -13,16 +13,16 @@ const AboutUs = () => {
       degree: "Bachelor in Computer Engineering",
       college: "IOE Purwanchal Campus",
       skills: [
-        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: " },
-        { icon: <FaTools className="text-green-500" />, text: "Back-End: " },
-        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: " },
-        { icon: <FaTools className="text-yellow-500" />, text: "Others: " },
+        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: React.js, Next.js, HTML, CSS, Tailwind CSS, Bootstrap" },
+        { icon: <FaTools className="text-green-500" />, text: "Back-End: Node.js, Express.js, Django, MongoDB, MySQL" },
+        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: Python, PyTorch, Scikit-learn, Pandas, NumPy" },
+        { icon: <FaTools className="text-yellow-500" />, text: "Others: Git, Docker, REST APIs, Responsive Design, Performance Optimization" },
       ],
       image: "",
-      facebook: "https://www.facebook.com/nigam.yadav.9693",   // Nigam's Facebook link
-      linkedin: "https://www.linkedin.com/in/nigamyadav72/",   // Nigam's LinkedIn link
-      instagram: "https://www.instagram.com/nigamyadav72/",   // Nigam's Instagram link
-      github: "https://github.com/nigamyadav72",   // Nigam's GitHub link
+      facebook: "https://www.facebook.com/nigam.yadav.9693",
+      linkedin: "https://www.linkedin.com/in/nigamyadav72/",
+      instagram: "https://www.instagram.com/nigamyadav72/",
+      github: "https://github.com/nigamyadav72",
       portfolio: "https://nigamyadav.com.np",
       animationDir: -50,
     },
@@ -33,16 +33,16 @@ const AboutUs = () => {
       degree: "Bachelor in Computer Engineering",
       college: "IOE Purwanchal Campus",
       skills: [
-        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: " },
-        { icon: <FaTools className="text-green-500" />, text: "Back-End: " },
-        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: " },
-        { icon: <FaTools className="text-yellow-500" />, text: "Others: " },
+        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: React, Tailwind CSS, HTML, CSS, JavaScript" },
+        { icon: <FaTools className="text-green-500" />, text: "Back-End: Node.js, Express.js, MongoDB" },
+        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: Python, NumPy, Pandas" },
+        { icon: <FaTools className="text-yellow-500" />, text: "Others: Git, REST APIs, Responsive Design, Performance Optimization" },
       ],
       image: "",
-      facebook: "https://www.facebook.com/sagar.katuwal.735",   // Sagar's Facebook link
-      linkedin: "https://www.linkedin.com/in/sa-gar-53a8a8263/",   // Sagar's LinkedIn link
-      instagram: "https://www.instagram.com/sagarkatuwal31/",   // Sagar's Instagram link
-      github: "https://github.com/sagaro1",   // Sagar's GitHub link
+      facebook: "https://www.facebook.com/sagar.katuwal.735",
+      linkedin: "https://www.linkedin.com/in/sa-gar-53a8a8263/",
+      instagram: "https://www.instagram.com/sagarkatuwal31/",
+      github: "https://github.com/sagaro1",
       portfolio: "",
       animationDir: 50,
     },
@@ -59,10 +59,10 @@ const AboutUs = () => {
         { icon: <FaTools className="text-yellow-500" />, text: "Others: Git, REST APIs, Responsive Design, Performance Optimization" },
       ],
       image: "",
-      facebook: "https://www.facebook.com/sakxam.gupta.92",   // Sonu's Facebook link
-      linkedin: "https://www.linkedin.com/in/sonu-gupta-681329340/",   // Sonu's LinkedIn link
-      instagram: "https://www.instagram.com/___gupta___sonu",   // Sonu's Instagram link
-      github: "https://github.com/creationsbysonu",   // Sonu's GitHub link
+      facebook: "https://www.facebook.com/sakxam.gupta.92",
+      linkedin: "https://www.linkedin.com/in/sonu-gupta-681329340/",
+      instagram: "https://www.instagram.com/___gupta___sonu",
+      github: "https://github.com/creationsbysonu",
       portfolio: "https://www.guptasonu.com.np/",
       animationDir: -50,
     },
@@ -73,16 +73,16 @@ const AboutUs = () => {
       degree: "Bachelor in Computer Engineering",
       college: "IOE Purwanchal Campus",
       skills: [
-        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: " },
-        { icon: <FaTools className="text-green-500" />, text: "Back-End: " },
-        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: " },
-        { icon: <FaTools className="text-yellow-500" />, text: "Others: " },
+        { icon: <FaLaptopCode className="text-blue-500" />, text: "Front-End: React, Tailwind CSS, HTML, CSS, JavaScript" },
+        { icon: <FaTools className="text-green-500" />, text: "Back-End: Node.js, Express.js, MongoDB" },
+        { icon: <FaBrain className="text-purple-500" />, text: "AI/ML: Python, TensorFlow, Scikit-learn, NumPy, Pandas" },
+        { icon: <FaTools className="text-yellow-500" />, text: "Others: Git, REST APIs, Responsive Design, Performance Optimization" },
       ],
       image: "",
-      facebook: "https://www.facebook.com/subash.giri.37454961",   // Suvash's Facebook link
-      linkedin: "https://www.linkedin.com/in/suvash-giri-3ab70233b/",   // Suvash's LinkedIn link
-      instagram: "https://www.instagram.com/__suvashg/",   // Suvash's Instagram link
-      github: "https://github.com/suvashg",   // Suvash's GitHub link
+      facebook: "https://www.facebook.com/subash.giri.37454961",
+      linkedin: "https://www.linkedin.com/in/suvash-giri-3ab70233b/",
+      instagram: "https://www.instagram.com/__suvashg/",
+      github: "https://github.com/suvashg",
       portfolio: "",
       animationDir: 50,
     },
