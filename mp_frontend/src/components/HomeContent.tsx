@@ -57,7 +57,7 @@ export default function HomeContent() {
   }, []);
 
   return (
-    <div className="pt-20">
+    <div id="home-content" className="pt-20">
       {/* Hero section */}
       <motion.section
         initial={{ opacity: 0, y: 30 }}
