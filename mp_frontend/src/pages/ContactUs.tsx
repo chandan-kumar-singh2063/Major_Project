@@ -1,6 +1,5 @@
-
 import { motion } from 'framer-motion';
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp } from 'react-icons/fa';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -70,12 +69,26 @@ const ContactUs = () => {
 
               <div className="flex items-center gap-4">
                 <FaPhoneAlt className="text-blue-600 text-xl" />
-                <span>+977-9819094640</span>
+                <span>+977-9806285040</span>
               </div>
 
               <div className="flex items-center gap-4">
                 <FaEnvelope className="text-blue-600 text-xl" />
-                <span>sonugupta.ioepc.edu.np@gmail.com</span>
+                <span>yadavnigam72@gmail.com</span>
+              </div>
+
+              {/* WhatsApp */}
+              <div className="flex items-center gap-4">
+                <FaWhatsapp className="text-green-500 text-2xl" />
+                <a>
+
+                  href="https://wa.me/9779806285040"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-green-500 transition-colors duration-200"
+
+                  Chat with us on WhatsApp
+                </a>
               </div>
 
               <div>
@@ -86,7 +99,7 @@ const ContactUs = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       <Footer />
     </>
