@@ -17,8 +17,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
             return image_str
         request = self.context.get('request')
         if request:
-            return request.build_absolute_uri(obj.image.url)
-        return obj.image.url
+            return request.build_absolute_uri(obj.image)
+        return obj.image
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,8 +95,8 @@ class ProductSerializer(serializers.ModelSerializer):
         try:
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
+                return request.build_absolute_uri(obj.image)
+            return obj.image
         except:
             return None
 

@@ -175,9 +175,9 @@ const ProductDetailPage = () => {
       setCartLoading(true);
       setErrorMsg(null);
 
-      const returnUrl = `${window.location.origin}/payment-success`;
+      const returnUrl = `${window.location.origin}/payment-success?quantity=${quantity}`;
       const response = await api.post("/payment/khalti/initiate/", {
-        amount: Math.round(productPrice * 100), // Khalti expects amount in paisa
+        amount: Math.round(productPrice * quantity * 100), // Khalti expects amount in paisa
         name: product.name,
         email: "customer@example.com",
         shipping_address: profile?.address || "Remote (Paid via Khalti)",

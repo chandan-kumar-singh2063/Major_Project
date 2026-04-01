@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '@/api/services';
 import ReCAPTCHA from 'react-google-recaptcha';
+import { useRef } from 'react';
 
 const RegisterPage = () => {
   const [form, setForm] = useState({ username: '', email: '', password: '', role: 'buyer' });
@@ -9,6 +10,7 @@ const RegisterPage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -35,15 +37,20 @@ const RegisterPage = () => {
 
       if (err.response?.data) {
         const data = err.response.data;
-        if (data.non_field_errors) errorMsg = data.non_field_errors[0];
+        if (data.error) errorMsg = data.error;
+        else if (data.non_field_errors) errorMsg = data.non_field_errors[0];
         else if (data.detail) errorMsg = data.detail;
         else if (data.email) errorMsg = `Email: ${data.email[0]}`;
         else if (data.username) errorMsg = `Username: ${data.username[0]}`;
         else if (data.password) errorMsg = `Password: ${data.password[0]}`;
         else if (data.recaptcha_token) errorMsg = `reCAPTCHA: ${data.recaptcha_token[0]}`;
+        else errorMsg = `Registration failed: ${typeof data === 'string' ? data : JSON.stringify(data)}`;
       }
 
       setError(errorMsg);
+      // Reset reCAPTCHA since the token is consumed/invalidated on the backend
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -98,14 +105,15 @@ const RegisterPage = () => {
             </select>
           </div>
           <ReCAPTCHA
+            ref={recaptchaRef}
             sitekey="6LfHFYUrAAAAACVr6Xq3VHKv4VJlaYSJgQ9uWCQE"
             onChange={setRecaptchaToken}
             className="mb-4"
           />
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-primary/90 transition mb-3"
-            disabled={loading || !recaptchaToken}
+            className="w-full bg-primary text-white py-2 rounded font-semibold transition mb-3 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary/90"
+            disabled={loading}
           >
             {loading ? 'Registering...' : 'Register'}
           </button>

@@ -26,6 +26,7 @@ export default function PaymentSuccess() {
             purchaseOrderId: searchParams.get('purchase_order_id') || searchParams.get('purchaseOrderId'),
             purchaseOrderName: searchParams.get('purchase_order_name'),
             pidx: searchParams.get('pidx') || searchParams.get('idx'),
+            quantity: searchParams.get('quantity') ? parseInt(searchParams.get('quantity') as string) : 1,
         };
         setTransactionDetails(details);
 
@@ -70,6 +71,7 @@ export default function PaymentSuccess() {
                 shipping_address: shippingAddress,
                 transaction_id: details.transactionId,
                 status: 'ordered',
+                quantity: details.quantity,
                 ...(buyNowProductId && { buy_now_product_id: buyNowProductId }),
                 ...(buyNowProductSku && { buy_now_product_sku: buyNowProductSku })
             });
